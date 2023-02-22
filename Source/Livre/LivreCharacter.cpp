@@ -72,15 +72,15 @@ void ALivreCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	}
 }
 
-void ALivreCharacter::StartSprint(float sprintSpeed)
+void ALivreCharacter::StartSprint(float NewSprintSpeed)
 {
 	
-	GetCharacterMovement()->MaxWalkSpeed = sprintSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = NewSprintSpeed;
 }
 
-void ALivreCharacter::StopSprint(float walkSpeed)
+void ALivreCharacter::StopSprint(float NewWalkSpeed)
 {
-	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = NewWalkSpeed;
 }
 
 void ALivreCharacter::SetHorizontalVelocity(float velocityX, float velocityY)
@@ -108,24 +108,29 @@ void ALivreCharacter::ClampHorizontalVelocity()
 	}
 }
 
-std::tuple<FVector, EnumWallRunEnd> ALivreCharacter::FindRunDirectionAndSide(FVector wallNormal)
+std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputWallNormal)
 {
+	return std::tuple(FVector(), int());
 }
 
 bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
 {
+	return false;
 }
 
 FVector ALivreCharacter::LaunchVelocity()
 {
+	return FVector();
 }
 
 bool ALivreCharacter::AreKeysRequired()
 {
+	return false;
 }
 
 FVector2d ALivreCharacter::GetHorizontalVelocity()
 {
+	return FVector2d();
 }
 
 

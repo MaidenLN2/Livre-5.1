@@ -86,14 +86,14 @@ public:
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	
 	//general functions
-	void StartSprint(float sprintSpeed);
-	void StopSprint(float walkSpeed);
+	void StartSprint(float NewSprintSpeed);
+	void StopSprint(float NewWalkSpeed);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
 	void ClampHorizontalVelocity();
 	
 	// pure functions
-	std::tuple<FVector, enum EnumWallRunEnd> FindRunDirectionAndSide(FVector wallNormal);
+	std::tuple<FVector, int> FindRunDirectionAndSide(FVector InputWallNormal);
 	bool IsSurfaceWallRan(FVector surfaceVector);
 	FVector LaunchVelocity();
 	bool AreKeysRequired();
