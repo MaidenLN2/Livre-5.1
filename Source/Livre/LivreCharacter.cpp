@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ALivreCharacter is LUIZZZZZZ
@@ -91,48 +93,144 @@ void ALivreCharacter::SetHorizontalVelocity(float velocityX, float velocityY)
 
 void ALivreCharacter::UpdateWallRun()
 {
+    if (AreKeysRequired())
+    {
+        FHitResult HitResultCapture;
+        FVector TraceEnd = GetActorLocation() + (GetActorRightVector() * (250 * (WallRunSide == Left ? 1 : -1)));
+        bool LineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
+            this,
+            GetActorLocation(),
+            TraceEnd,
+            UEngineTypes::ConvertToTraceType(ECC_Visibility),
+            false,
+            TArray<AActor*>(),
+            EDrawDebugTrace::None,
+            HitResultCapture,
+            true
+            );
+
+        if (LineTraceDidHit)
+        {
+            auto [Direction, Side] = FindRunDirectionAndSide(HitResultCapture.ImpactNormal);
+
+            if (Side == WallRunSide)
+            {
+                wallRunDirection = Direction;
+
+                FVector SpeedByWallRunDirection = wallRunDirection * GetCharacterMovement()->GetMaxSpeed();
+                GetCharacterMovement()->Velocity = FVector(SpeedByWallRunDirection.X, SpeedByWallRunDirection.Y, 0.0f);
+            }
+            else
+            {
+                // Call End Wall Run Event Here - Reason is FallOff
+            }
+        }
+        else
+        {
+            // Call End Run Event here. Reason is FallOff
+        }
+    }
 }
 
 void ALivreCharacter::ClampHorizontalVelocity()
 {
-	if (GetCharacterMovement()->IsFalling())
-	{
-		float length = GetHorizontalVelocity().Length();
-		float lengthBySpeed = length / GetCharacterMovement()->GetMaxSpeed();
-		
-		if (lengthBySpeed > 1)
-		{
-			FVector2d clampedHorizontalVelocity = GetHorizontalVelocity() / lengthBySpeed;
-			SetHorizontalVelocity(clampedHorizontalVelocity.X, clampedHorizontalVelocity.Y);
-		}
-	}
+    if (GetCharacterMovement()->IsFalling())
+    {
+        float length = GetHorizontalVelocity().Length();
+        float lengthBySpeed = length / GetCharacterMovement()->GetMaxSpeed();
+        
+        if (lengthBySpeed > 1)
+        {
+            FVector2d clampedHorizontalVelocity = GetHorizontalVelocity() / lengthBySpeed;
+            SetHorizontalVelocity(clampedHorizontalVelocity.X, clampedHorizontalVelocity.Y);
+        }
+    }
 }
 
 std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputWallNormal)
 {
-	return std::tuple(FVector(), int());
+	enum WallRunSide SideLocal;
+    FVector2d test1(InputWallNormal);
+    FVector2d test2(GetActorRightVector());
+
+    float DotProd = FVector2d::DotProduct(test1, test2);
+
+    float zFlip = 1;
+    if  (DotProd > 0)
+    {
+        SideLocal = Right;
+    }
+    else
+    {
+        SideLocal = Left;
+        zFlip *= -1;
+    }
+
+    FVector CrossProduct = FVector::CrossProduct(InputWallNormal, FVector(0, 0, zFlip));
+
+    return std::tuple(CrossProduct, SideLocal);
 }
 
 bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
 {
-	return false;
+    if (surfaceVector.Z < -0.05f)
+    {
+        return false;
+    }
+    
+    FVector DotComp = FVector(surfaceVector.X, surfaceVector.Y, 0.0f);
+    DotComp.Normalize();
+
+    float DotResult = FVector::DotProduct(DotComp, surfaceVector);
+    float ArcCosDotResult = UKismetMathLibrary::DegAcos(DotResult);    // Had to check the old project to see what it used to get this function. Answer is the KismetMathLibrary
+    
+    float WalkableFloorAngle = GetCharacterMovement()->GetWalkableFloorAngle();
+    
+    return (ArcCosDotResult < WalkableFloorAngle);
 }
 
 FVector ALivreCharacter::LaunchVelocity()
 {
-	return FVector();
+    FVector LaunchDirection;
+    // Sequence 0
+    if (isWallRunning)
+    {
+        FVector CrossComp = FVector(0, 0, WallRunSide == Left ? 1 : -1 );
+
+        LaunchDirection = FVector::CrossProduct(wallRunDirection, CrossComp);
+    }
+    else
+    {
+        if (GetCharacterMovement()->IsFalling())
+        {
+            LaunchDirection = (GetActorRightVector() * axisRight) + (GetActorForwardVector() * axisForward);
+        }
+    }
+
+    // Sequence 1
+    return (LaunchDirection + FVector(0, 0, 1)) * GetCharacterMovement()->JumpZVelocity;
 }
 
 bool ALivreCharacter::AreKeysRequired()
 {
-	return false;
+    if (axisForward > 0.1f)
+    {
+        switch (WallRunSide)
+        {
+        case Left:
+            return axisRight > 0.1f;
+        case Right:
+            return axisRight < 0.1f;
+        default: ;
+        }
+    }
+    return false;
 }
 
 FVector2d ALivreCharacter::GetHorizontalVelocity()
 {
-	return FVector2d();
+    return FVector2d(GetCharacterMovement()->GetLastUpdateVelocity());
 }
-
 
 void ALivreCharacter::Move(const FInputActionValue& Value)
 {

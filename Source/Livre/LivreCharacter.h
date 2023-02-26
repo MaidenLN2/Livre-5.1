@@ -98,6 +98,15 @@ public:
 	FVector LaunchVelocity();
 	bool AreKeysRequired();
 	FVector2d GetHorizontalVelocity();
+
+protected:
+	enum WallRunSide
+	{
+		Left = 0,
+		Right
+	};
+	
+	WallRunSide WallRunSide;
 	
 private:
 
@@ -123,6 +132,16 @@ private:
 	float health;
 	float initialGravity;
 	float fallingGravity;
+
+	// wall running variables
+	FVector wallRunDirection;
+	bool isWallRunning;
+	int jumpLeft;
+	int maxJump;
+	float axisRight;
+	float axisForward;
+
+	// UPROPERTY(EditInstanceOnly)
 	
 };
 

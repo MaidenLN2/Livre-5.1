@@ -76,3 +76,4 @@ DerivedDataCache/*
 # For Rider plugin
 Plugins/Developer/RiderLink
 .idea
+.idea/.idea.Livre/.idea/workspace.xml
