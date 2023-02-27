@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -37,14 +38,17 @@ ALivreCharacter::ALivreCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	// Connecting Collision Detection Functions
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// Might work?
+
 }
 
 void ALivreCharacter::BeginPlay()
 {
-	// Call the base class  
+	// call the base class  
 	Super::BeginPlay();
 
-	//Add Input Mapping Context
+	//add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -53,30 +57,269 @@ void ALivreCharacter::BeginPlay()
 		}
 	}
 
+	// Event Graph Functionality:
+	EventJumpReset(maxJump);
+
+	GetCharacterMovement()->SetPlaneConstraintEnabled(false);
+
+	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // NOTICE -> Might need to be a BP specific function
+
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void ALivreCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	// Set up action bindings
+	// set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+
+
+		//jumping
+		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		//Moving
+		//moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
 
-		//Looking
+		//looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
+	}
+}
+
+void ALivreCharacter::CustomJump()
+{
+	if (JumpUsed())
+	{
+		LaunchCharacter(LaunchVelocity(), false, true);
+
+		if (isWallRunning)
+		{
+			EndWallRun(JumpOff);
+		}
+	}
+}
+
+void ALivreCharacter::CustomSprintPressed()
+{
+	isSprinting = true;
+	StartSprint();
+}
+
+void ALivreCharacter::CustomSprintReleased()
+{
+	isSprinting = false;
+	StopSprint();
+}
+
+void ALivreCharacter::CustomSlidePressed()
+{
+	if (isSprinting && !GetCharacterMovement()->IsFalling())
+	{
+		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+		AddMovementInput(FVector(), 200.0f, false);
+
+
+		// Sliding Anim Goes Here
+		// float Duration = PlayAnimMontage(/*Insert Anim Montage Here*/);
+		float Duration = 5.0f;
+
+		FTimerHandle CSP_TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(CSP_TimerHandle, [&]()
+		{
+			UKismetSystemLibrary::PrintString(this, "Sliding Happened After Animation");
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+			FTimerHandle CSP_InternalTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(CSP_InternalTimerHandle, [&]()
+			{
+				GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
+			}, 0.5f, false);
+		}, Duration, false);
+	}
+}
+
+void ALivreCharacter::CustomVaultingPressed()
+{
+	FVector StartPos = GetActorLocation() - FVector(0.0, 0.0, 44.0);
+	FVector EndPos = StartPos + (GetActorForwardVector() * 70.0f);
+	FHitResult HitTracking;
+	// look more in here
+	bool FirstLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
+		this,
+		StartPos,
+		EndPos,
+		TArray<TEnumAsByte<EObjectTypeQuery>>(),
+		true,
+		TArray<AActor*>(),
+		EDrawDebugTrace::ForDuration,
+		HitTracking,
+		true
+		);
+
+	if (FirstLineTraceDidHit)
+	{
+		wallLocation = HitTracking.Location;
+		wallNormal = HitTracking.Normal;
+		
+		FVector EndPos2 = (
+			wallLocation +
+			(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * -10.0f)
+			);
+		FVector StartPos2 = EndPos2 - FVector(0.0f, 0.0f, 200.0f);
+		FHitResult HitTracking2;
+		
+		bool SecondLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
+			this,
+			StartPos2,
+			EndPos2,
+			TArray<TEnumAsByte<EObjectTypeQuery>>(),
+			true,
+			TArray<AActor*>(),
+			EDrawDebugTrace::ForDuration,
+			HitTracking2,
+			true
+			);
+
+		if (SecondLineTraceDidHit)
+		{
+			wallHeight = HitTracking2.Location;
+			// sequence 0
+			aboutToClimb = ((wallHeight - wallLocation).Z > 60.0f);
+
+			// sequence 1
+			FVector StartPos3 = (
+				wallLocation +
+				(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * -50.0f) +
+				FVector(0.0f, 0.0f, 250.0f)
+				);
+			FVector EndPos3 = StartPos3 - FVector(0.0f, 0.0f, 300.0f);
+			FHitResult HitTracking3;
+
+			bool ThirdLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
+				this,
+				StartPos3,
+				EndPos3,
+				TArray<TEnumAsByte<EObjectTypeQuery>>(),
+				true,
+				TArray<AActor*>(),
+				EDrawDebugTrace::ForDuration,
+				HitTracking3,
+				true
+				);
+
+			if (ThirdLineTraceDidHit)
+			{
+				wallHeight2 = HitTracking3.Location;
+
+				wallIsThicc = (wallHeight - wallHeight2).Z <= 30.0f;	//  negation was removed for simplicity
+			}
+			else
+			{
+				wallIsThicc = false;
+			}
+
+			if (aboutToClimb)
+			{
+				// sequence 0
+				FVector StartPos4 = GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);
+				
+				bool FourthLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
+					this,
+					StartPos4,
+					StartPos4 + GetActorForwardVector() * 70.0f,
+					TArray<TEnumAsByte<EObjectTypeQuery>>(),
+					true,
+					TArray<AActor*>(),
+					EDrawDebugTrace::ForDuration,
+					HitTracking3,
+					true
+					);
+
+				if (FourthLineTraceDidHit) canClimb = false;
+				
+				// this last trace may not be necessary, none of the outputs are used.
+				bool FifthLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
+					this,
+					GetActorLocation(),
+					GetActorLocation() + FVector(0.0f, 0.0f, 200.0f),
+					TArray<TEnumAsByte<EObjectTypeQuery>>(),
+					true,
+					TArray<AActor*>(),
+					EDrawDebugTrace::ForDuration,
+					HitTracking3,
+					true
+					);
+
+				// sequence 1
+				if (canClimb)
+				{
+					GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+					SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
+					
+					SetActorLocation(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * 50.0f + GetActorLocation());
+					SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 44.0f));
+					
+					// play anim montage here
+					// Duration = PlayAnimMontage();
+					float Duration = 4.0f;
+
+					UKismetSystemLibrary::PrintString(this, "landing happened after animation");
+
+					FTimerHandle CVP_ClimbTimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(CVP_ClimbTimerHandle, [&]()
+					{
+						GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+						GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+					}, Duration, false);
+				}
+			}
+			else
+			{
+				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+
+				FVector NewActorLocation = (UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * 50.0f) + GetActorLocation();
+				SetActorLocation(NewActorLocation);
+
+				float Duration;
+				if (wallIsThicc)
+				{
+					// NOTICE 
+					// getting Up Animation goes here
+					// Duration = PlayAnimMontage();
+					Duration = 4.0f;
+				}
+				else
+				{
+					SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 20.0f));
+					
+					// Duration = PlayAnimMontage();
+					Duration = 3.0f;
+					UKismetSystemLibrary::PrintString(this, "vaulting happened after animation");
+				}
+
+				FTimerHandle CVP_TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(CVP_TimerHandle, [&]()
+				{
+					GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+					GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+					SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
+				}, Duration, false);
+			}
+		}
 	}
 }
 
 void ALivreCharacter::StartSprint(float NewSprintSpeed)
 {
-	
 	GetCharacterMovement()->MaxWalkSpeed = NewSprintSpeed;
 }
 
@@ -122,12 +365,12 @@ void ALivreCharacter::UpdateWallRun()
             }
             else
             {
-                // Call End Wall Run Event Here - Reason is FallOff
+            	EndWallRun(FallOff);
             }
         }
         else
         {
-            // Call End Run Event here. Reason is FallOff
+        	EndWallRun(FallOff);
         }
     }
 }
@@ -182,7 +425,7 @@ bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
     DotComp.Normalize();
 
     float DotResult = FVector::DotProduct(DotComp, surfaceVector);
-    float ArcCosDotResult = UKismetMathLibrary::DegAcos(DotResult);    // Had to check the old project to see what it used to get this function. Answer is the KismetMathLibrary
+    float ArcCosDotResult = UKismetMathLibrary::DegAcos(DotResult);    // KismetMathLibrary broooo
     
     float WalkableFloorAngle = GetCharacterMovement()->GetWalkableFloorAngle();
     
@@ -192,7 +435,7 @@ bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
 FVector ALivreCharacter::LaunchVelocity()
 {
     FVector LaunchDirection;
-    // Sequence 0
+    // sequence 0
     if (isWallRunning)
     {
         FVector CrossComp = FVector(0, 0, WallRunSide == Left ? 1 : -1 );
@@ -207,7 +450,7 @@ FVector ALivreCharacter::LaunchVelocity()
         }
     }
 
-    // Sequence 1
+    // sequence 1
     return (LaunchDirection + FVector(0, 0, 1)) * GetCharacterMovement()->JumpZVelocity;
 }
 
@@ -230,6 +473,122 @@ bool ALivreCharacter::AreKeysRequired()
 FVector2d ALivreCharacter::GetHorizontalVelocity()
 {
     return FVector2d(GetCharacterMovement()->GetLastUpdateVelocity());
+}
+
+bool ALivreCharacter::JumpUsed()
+{
+	if (isWallRunning)	return true;
+
+	if (jumpLeft > 0)
+	{
+		jumpLeft--;
+		return true;
+	}
+	
+	return false;
+}
+
+void ALivreCharacter::EventJumpReset(int Jumps)
+{
+	jumpLeft = UKismetMathLibrary::Clamp(Jumps, 0, maxJump);
+}
+
+void ALivreCharacter::EventAnyDamage(float Damage)
+{
+	health -= Damage;
+
+	if (health <= 0.0f)
+	{
+		isDead = true;
+		UGameplayStatics::OpenLevel(this, FName("Blaike_Test_04"));
+	}
+}
+
+void ALivreCharacter::EventOnLanded()
+{
+	EventJumpReset(maxJump);
+
+	GetCharacterMovement()->GravityScale = initialGravity;
+
+	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
+}
+
+void ALivreCharacter::CapsuleTouched(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	if (isWallRunning) return;
+
+	if (IsSurfaceWallRan(SweepResult.ImpactNormal) && GetCharacterMovement()->IsFalling())
+	{
+		auto [OutDir, OutSide] = FindRunDirectionAndSide(SweepResult.ImpactNormal);
+		wallRunDirection = OutDir;
+
+		switch (OutSide)
+		{
+		case Left:
+			WallRunSide = Left;
+			break;
+		case Right:
+			WallRunSide = Right;
+			break;
+		default: break;
+		}
+
+		if (AreKeysRequired())
+		{
+			BeginWallRun();
+		}
+		else
+		{
+			EndWallRun(FallOff);
+		}
+	}
+}
+
+void ALivreCharacter::BeginWallRun()
+{
+	// sequence 0
+	FTimerHandle BWR_Delayhandle;
+	GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
+	{
+		// call End Wall Run
+	}, 2, false);
+	
+	// sequence 1
+	GetCharacterMovement()->AirControl = 1.0f;
+	GetCharacterMovement()->GravityScale = 0.0f;
+
+	isWallRunning = true;
+	//  place for camera tilt begin
+
+	// Timeline the UpdateWallRun function for 5 seconds
+}
+
+void ALivreCharacter::EndWallRun(WallRunEnd Why)
+{
+	switch (Why)
+	{
+	case FallOff:
+		EventJumpReset(1);
+		break;
+	case JumpOff:
+		EventJumpReset(maxJump);
+		break;
+	default: ;
+	}
+
+	GetCharacterMovement()->AirControl = 0.05f;
+	GetCharacterMovement()->GravityScale = 1.0f;
+	isWallRunning = false;
+
+	//  place for camera tilt end
+
+
 }
 
 void ALivreCharacter::Move(const FInputActionValue& Value)

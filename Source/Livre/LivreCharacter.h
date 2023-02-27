@@ -79,18 +79,40 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
 
+	// ENUMS
+	enum WallRunSide
+	{
+		Left = 0,
+		Right
+	};
+	
+	WallRunSide WallRunSide;
+
+	enum WallRunEnd
+	{
+		FallOff = 0,
+		JumpOff
+	};
+
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	
+	// InputAction Overrides
+	void CustomJump();
+	void CustomSprintPressed();
+	void CustomSprintReleased();
+	void CustomSlidePressed();
+	void CustomVaultingPressed();
+	
 	//general functions
-	void StartSprint(float NewSprintSpeed);
-	void StopSprint(float NewWalkSpeed);
+	void StartSprint(float NewSprintSpeed = 1000.0f);
+	void StopSprint(float NewWalkSpeed = 600.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
-	void ClampHorizontalVelocity();
+	void ClampHorizontalVelocity();	// Expose to blueprints as this character doesn't have tick for some reason.
 	
 	// pure functions
 	std::tuple<FVector, int> FindRunDirectionAndSide(FVector InputWallNormal);
@@ -99,14 +121,26 @@ public:
 	bool AreKeysRequired();
 	FVector2d GetHorizontalVelocity();
 
-protected:
-	enum WallRunSide
-	{
-		Left = 0,
-		Right
-	};
-	
-	WallRunSide WallRunSide;
+	// macros
+	bool JumpUsed();
+
+	// events
+	void EventJumpReset(int Jumps);
+	void EventAnyDamage(float Damage);
+	void EventOnLanded();
+	// collision event
+	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible. Am hoping this overrides its base collision detection
+	void CapsuleTouched(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult &SweepResult
+		);
+	// ervents continued
+	void BeginWallRun();
+	void EndWallRun(WallRunEnd Why);
 	
 private:
 
@@ -144,4 +178,3 @@ private:
 	// UPROPERTY(EditInstanceOnly)
 	
 };
-
