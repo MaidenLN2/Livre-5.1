@@ -47,6 +47,7 @@ void ALivreCharacter::BeginPlay()
 {
 	// call the base class  
 	Super::BeginPlay();
+	printf("BeginPlay()");
 
 	//add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -59,10 +60,11 @@ void ALivreCharacter::BeginPlay()
 
 	// Event Graph Functionality:
 	EventJumpReset(maxJump);
-
+	printf("jump reset");
 	GetCharacterMovement()->SetPlaneConstraintEnabled(false);
+	printf("GetCharacterMovement()->SetPlaneConstraintEnabled(false)");
 
-	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // NOTICE -> Might need to be a BP specific function
+	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // might need to be a BP specific function
 
 }
 
@@ -79,12 +81,15 @@ void ALivreCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		printf("jumping");
 
 		//moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
+		printf("moving");
 
 		//looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
+		printf("looking");
 	}
 }
 
@@ -99,18 +104,21 @@ void ALivreCharacter::CustomJump()
 			EndWallRun(JumpOff);
 		}
 	}
+	printf("CustomJum()");
 }
 
 void ALivreCharacter::CustomSprintPressed()
 {
 	isSprinting = true;
 	StartSprint();
+	printf("CustomSprintPressed");
 }
 
 void ALivreCharacter::CustomSprintReleased()
 {
 	isSprinting = false;
 	StopSprint();
+	printf("zcustomSprintReleased");
 }
 
 void ALivreCharacter::CustomSlidePressed()
@@ -143,6 +151,7 @@ void ALivreCharacter::CustomSlidePressed()
 			}, 0.5f, false);
 		}, Duration, false);
 	}
+	printf("custom slide pressed");
 }
 
 void ALivreCharacter::CustomVaultingPressed()
@@ -321,17 +330,20 @@ void ALivreCharacter::CustomVaultingPressed()
 void ALivreCharacter::StartSprint(float NewSprintSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSprintSpeed;
+	printf("start sprint");
 }
 
 void ALivreCharacter::StopSprint(float NewWalkSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewWalkSpeed;
+	printf("stop sprint");
 }
 
 void ALivreCharacter::SetHorizontalVelocity(float velocityX, float velocityY)
 {
 	float z = GetCharacterMovement()->Velocity.Z;
 	GetCharacterMovement()->Velocity = FVector(velocityX, velocityY, z);
+	printf("set horizontal velocity");
 }
 
 void ALivreCharacter::UpdateWallRun()
@@ -373,6 +385,7 @@ void ALivreCharacter::UpdateWallRun()
         	EndWallRun(FallOff);
         }
     }
+	printf("update wall run");
 }
 
 void ALivreCharacter::ClampHorizontalVelocity()
@@ -388,6 +401,7 @@ void ALivreCharacter::ClampHorizontalVelocity()
             SetHorizontalVelocity(clampedHorizontalVelocity.X, clampedHorizontalVelocity.Y);
         }
     }
+	printf("clamp horizontal velocity");
 }
 
 std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputWallNormal)
@@ -410,7 +424,7 @@ std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputW
     }
 
     FVector CrossProduct = FVector::CrossProduct(InputWallNormal, FVector(0, 0, zFlip));
-
+	printf("find run direction and side");
     return std::tuple(CrossProduct, SideLocal);
 }
 
@@ -428,7 +442,7 @@ bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
     float ArcCosDotResult = UKismetMathLibrary::DegAcos(DotResult);    // KismetMathLibrary broooo
     
     float WalkableFloorAngle = GetCharacterMovement()->GetWalkableFloorAngle();
-    
+	printf("is surface wall run");
     return (ArcCosDotResult < WalkableFloorAngle);
 }
 
@@ -449,7 +463,7 @@ FVector ALivreCharacter::LaunchVelocity()
             LaunchDirection = (GetActorRightVector() * axisRight) + (GetActorForwardVector() * axisForward);
         }
     }
-
+	printf("launch velocity");
     // sequence 1
     return (LaunchDirection + FVector(0, 0, 1)) * GetCharacterMovement()->JumpZVelocity;
 }
@@ -467,11 +481,13 @@ bool ALivreCharacter::AreKeysRequired()
         default: ;
         }
     }
+	printf("are keys required");
     return false;
 }
 
 FVector2d ALivreCharacter::GetHorizontalVelocity()
 {
+	printf("get horizontal velocity");
     return FVector2d(GetCharacterMovement()->GetLastUpdateVelocity());
 }
 
@@ -484,7 +500,7 @@ bool ALivreCharacter::JumpUsed()
 		jumpLeft--;
 		return true;
 	}
-	
+	printf("jump used");
 	return false;
 }
 
@@ -500,7 +516,7 @@ void ALivreCharacter::EventAnyDamage(float Damage)
 	if (health <= 0.0f)
 	{
 		isDead = true;
-		UGameplayStatics::OpenLevel(this, FName("Blaike_Test_04"));
+		UGameplayStatics::OpenLevel(this, FName("Main_Menu"));
 	}
 }
 
