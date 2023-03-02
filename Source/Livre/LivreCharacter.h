@@ -54,6 +54,9 @@ public:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float sensitivity = 1.0f;
 
 	/** Bool for AnimBP to switch to another animation set 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
@@ -73,6 +76,11 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void MoveForward(float value);
+	void MoveLateral(float value);
+	void LookHorizontal(float value);
+	void LookVertical(float value);
 
 protected:
 	// APawn interface

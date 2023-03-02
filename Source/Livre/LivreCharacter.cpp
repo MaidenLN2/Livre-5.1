@@ -19,7 +19,7 @@ ALivreCharacter::ALivreCharacter()
 {
 	// Character doesnt have a rifle at start
 	//bHasRifle = false;
-	
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 		
@@ -70,27 +70,55 @@ void ALivreCharacter::BeginPlay()
 
 //////////////////////////////////////////////////////////////////////////// Input
 
-void ALivreCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+ void ALivreCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+ {
+ 	// set up action bindings
+ 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+ 	{
+
+
+ 		//jumping
+ 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
+ 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
+ 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+ 		
+ 		printf("jumping");
+
+// 		//moving
+ 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
+ 		printf("moving");
+
+// 		//looking
+ 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
+ 		printf("looking");
+
+ 		PlayerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
+ 		PlayerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
+ 		PlayerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
+ 		PlayerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
+ 		PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALivreCharacter::Jump);
+ 	}
+ }
+
+void ALivreCharacter::MoveForward(float value)
 {
-	// set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
+	AddMovementInput(RootComponent->GetForwardVector(), FMath::Clamp(value, -1.0f, 1.0f));
+}
 
+void ALivreCharacter::MoveLateral(float value)
+{
+	AddMovementInput(RootComponent->GetRightVector(), FMath::Clamp(value, -1.0f, 1.0f));
+}
 
-		//jumping
-		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		printf("jumping");
+void ALivreCharacter::LookHorizontal(float value)
+{
+	AddControllerYawInput(value * sensitivity);
+}
 
-		//moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
-		printf("moving");
-
-		//looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
-		printf("looking");
-	}
+void ALivreCharacter::LookVertical(float value)
+{
+	AddControllerPitchInput(-value * sensitivity);
 }
 
 void ALivreCharacter::CustomJump()
