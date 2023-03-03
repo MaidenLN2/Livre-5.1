@@ -41,6 +41,7 @@ ALivreCharacter::ALivreCharacter()
 	// Connecting Collision Detection Functions
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// Might work?
 
+	maxJump = 2;
 }
 
 void ALivreCharacter::BeginPlay()
@@ -97,7 +98,7 @@ void ALivreCharacter::BeginPlay()
  		PlayerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
  		PlayerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
  		PlayerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
- 		PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALivreCharacter::Jump);
+ 		PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALivreCharacter::CustomJump);
  	}
  }
 
@@ -125,14 +126,14 @@ void ALivreCharacter::CustomJump()
 {
 	if (JumpUsed())
 	{
-		LaunchCharacter(LaunchVelocity(), false, true);
+		Jump();
 
 		if (isWallRunning)
 		{
 			EndWallRun(JumpOff);
 		}
 	}
-	printf("CustomJum()");
+	printf("CustomJump()");
 }
 
 void ALivreCharacter::CustomSprintPressed()
@@ -162,7 +163,7 @@ void ALivreCharacter::CustomSlidePressed()
 
 
 		// Sliding Anim Goes Here
-		// float Duration = PlayAnimMontage(/*Insert Anim Montage Here*/);
+		//float Duration = PlayAnimMontage(/*Insert Anim Montage Here*/);
 		float Duration = 5.0f;
 
 		FTimerHandle CSP_TimerHandle;
@@ -185,12 +186,12 @@ void ALivreCharacter::CustomSlidePressed()
 void ALivreCharacter::CustomVaultingPressed()
 {
 	FVector StartPos = GetActorLocation() - FVector(0.0, 0.0, 44.0);
-	FVector EndPos = StartPos + (GetActorForwardVector() * 70.0f);
+	FVector EndPos = StartPos + (GetActorForwardVector() * 70.0f); //GetFirstPersonCameraComponent()->GetForwardVector() * 70.0f;
 	FHitResult HitTracking;
 	// look more in here
 	bool FirstLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
 		this,
-		StartPos,
+		StartPos, //get camera position
 		EndPos,
 		TArray<TEnumAsByte<EObjectTypeQuery>>(),
 		true,
