@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "InputMappingContext.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ALivreCharacter is LUIZZZZZZ
@@ -19,11 +20,11 @@ ALivreCharacter::ALivreCharacter()
 {
 	// Character doesnt have a rifle at start
 	//bHasRifle = false;
-	
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 		
-	// Create a CameraComponent	
+	// Create a CameraComponent
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
@@ -41,12 +42,14 @@ ALivreCharacter::ALivreCharacter()
 	// Connecting Collision Detection Functions
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// Might work?
 
+	maxJump = 2;
 }
 
 void ALivreCharacter::BeginPlay()
 {
 	// call the base class  
 	Super::BeginPlay();
+	printf("BeginPlay()");
 
 	//add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -59,58 +62,96 @@ void ALivreCharacter::BeginPlay()
 
 	// Event Graph Functionality:
 	EventJumpReset(maxJump);
-
+	printf("jump reset");
 	GetCharacterMovement()->SetPlaneConstraintEnabled(false);
+	printf("GetCharacterMovement()->SetPlaneConstraintEnabled(false)");
 
-	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // NOTICE -> Might need to be a BP specific function
+	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // might need to be a BP specific function
 
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
-void ALivreCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+ void ALivreCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+ {
+ 	// set up action bindings
+ 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+ 	{
+
+
+ 		//jumping
+ 		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
+ 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
+ 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+ 		
+ 		printf("jumping");
+
+// 		//moving
+ 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
+ 		printf("moving");
+
+// 		//looking
+ 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
+ 		printf("looking");
+
+ 		PlayerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
+ 		PlayerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
+ 		PlayerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
+ 		PlayerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
+ 		//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALivreCharacter::CustomJump);
+ 	}
+ }
+
+void ALivreCharacter::MoveForward(float value)
 {
-	// set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
+	AddMovementInput(RootComponent->GetForwardVector(), FMath::Clamp(value, -1.0f, 1.0f));
+}
 
+void ALivreCharacter::MoveLateral(float value)
+{
+	AddMovementInput(RootComponent->GetRightVector(), FMath::Clamp(value, -1.0f, 1.0f));
+}
 
-		//jumping
-		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+void ALivreCharacter::LookHorizontal(float value)
+{
+	AddControllerYawInput(value * sensitivity);
+}
 
-		//moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
-
-		//looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
-	}
+void ALivreCharacter::LookVertical(float value)
+{
+	AddControllerPitchInput(-value * sensitivity);
 }
 
 void ALivreCharacter::CustomJump()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Calling CustomJump()"));
+	
 	if (JumpUsed())
 	{
-		LaunchCharacter(LaunchVelocity(), false, true);
+		UE_LOG(LogTemp, Warning, TEXT("Calling Jump()"));
+		Jump();
 
 		if (isWallRunning)
 		{
 			EndWallRun(JumpOff);
 		}
 	}
+	printf("CustomJump()");
 }
 
 void ALivreCharacter::CustomSprintPressed()
 {
 	isSprinting = true;
 	StartSprint();
+	printf("CustomSprintPressed");
 }
 
 void ALivreCharacter::CustomSprintReleased()
 {
 	isSprinting = false;
 	StopSprint();
+	printf("zcustomSprintReleased");
 }
 
 void ALivreCharacter::CustomSlidePressed()
@@ -126,7 +167,7 @@ void ALivreCharacter::CustomSlidePressed()
 
 
 		// Sliding Anim Goes Here
-		// float Duration = PlayAnimMontage(/*Insert Anim Montage Here*/);
+		//float Duration = PlayAnimMontage(/*Insert Anim Montage Here*/);
 		float Duration = 5.0f;
 
 		FTimerHandle CSP_TimerHandle;
@@ -143,17 +184,18 @@ void ALivreCharacter::CustomSlidePressed()
 			}, 0.5f, false);
 		}, Duration, false);
 	}
+	printf("custom slide pressed");
 }
 
 void ALivreCharacter::CustomVaultingPressed()
 {
 	FVector StartPos = GetActorLocation() - FVector(0.0, 0.0, 44.0);
-	FVector EndPos = StartPos + (GetActorForwardVector() * 70.0f);
+	FVector EndPos = StartPos + (GetActorForwardVector() * 70.0f); //GetFirstPersonCameraComponent()->GetForwardVector() * 70.0f;
 	FHitResult HitTracking;
 	// look more in here
 	bool FirstLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
 		this,
-		StartPos,
+		StartPos, //get camera position
 		EndPos,
 		TArray<TEnumAsByte<EObjectTypeQuery>>(),
 		true,
@@ -321,17 +363,20 @@ void ALivreCharacter::CustomVaultingPressed()
 void ALivreCharacter::StartSprint(float NewSprintSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSprintSpeed;
+	printf("start sprint");
 }
 
 void ALivreCharacter::StopSprint(float NewWalkSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewWalkSpeed;
+	printf("stop sprint");
 }
 
 void ALivreCharacter::SetHorizontalVelocity(float velocityX, float velocityY)
 {
 	float z = GetCharacterMovement()->Velocity.Z;
 	GetCharacterMovement()->Velocity = FVector(velocityX, velocityY, z);
+	printf("set horizontal velocity");
 }
 
 void ALivreCharacter::UpdateWallRun()
@@ -373,6 +418,7 @@ void ALivreCharacter::UpdateWallRun()
         	EndWallRun(FallOff);
         }
     }
+	printf("update wall run");
 }
 
 void ALivreCharacter::ClampHorizontalVelocity()
@@ -388,6 +434,7 @@ void ALivreCharacter::ClampHorizontalVelocity()
             SetHorizontalVelocity(clampedHorizontalVelocity.X, clampedHorizontalVelocity.Y);
         }
     }
+	printf("clamp horizontal velocity");
 }
 
 std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputWallNormal)
@@ -410,7 +457,7 @@ std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputW
     }
 
     FVector CrossProduct = FVector::CrossProduct(InputWallNormal, FVector(0, 0, zFlip));
-
+	printf("find run direction and side");
     return std::tuple(CrossProduct, SideLocal);
 }
 
@@ -428,7 +475,7 @@ bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
     float ArcCosDotResult = UKismetMathLibrary::DegAcos(DotResult);    // KismetMathLibrary broooo
     
     float WalkableFloorAngle = GetCharacterMovement()->GetWalkableFloorAngle();
-    
+	printf("is surface wall run");
     return (ArcCosDotResult < WalkableFloorAngle);
 }
 
@@ -449,7 +496,7 @@ FVector ALivreCharacter::LaunchVelocity()
             LaunchDirection = (GetActorRightVector() * axisRight) + (GetActorForwardVector() * axisForward);
         }
     }
-
+	printf("launch velocity");
     // sequence 1
     return (LaunchDirection + FVector(0, 0, 1)) * GetCharacterMovement()->JumpZVelocity;
 }
@@ -467,11 +514,13 @@ bool ALivreCharacter::AreKeysRequired()
         default: ;
         }
     }
+	printf("are keys required");
     return false;
 }
 
 FVector2d ALivreCharacter::GetHorizontalVelocity()
 {
+	printf("get horizontal velocity");
     return FVector2d(GetCharacterMovement()->GetLastUpdateVelocity());
 }
 
@@ -484,12 +533,14 @@ bool ALivreCharacter::JumpUsed()
 		jumpLeft--;
 		return true;
 	}
-	
+	printf("jump used");
 	return false;
 }
 
 void ALivreCharacter::EventJumpReset(int Jumps)
 {
+	UE_LOG(LogTemp, Warning, TEXT("CALLING EVENTJUMPRESET(). New Jump Value = %i"), Jumps);
+
 	jumpLeft = UKismetMathLibrary::Clamp(Jumps, 0, maxJump);
 }
 
@@ -500,7 +551,7 @@ void ALivreCharacter::EventAnyDamage(float Damage)
 	if (health <= 0.0f)
 	{
 		isDead = true;
-		UGameplayStatics::OpenLevel(this, FName("Blaike_Test_04"));
+		UGameplayStatics::OpenLevel(this, FName("Main_Menu"));
 	}
 }
 
@@ -508,7 +559,7 @@ void ALivreCharacter::EventOnLanded()
 {
 	EventJumpReset(maxJump);
 
-	GetCharacterMovement()->GravityScale = initialGravity;
+	//GetCharacterMovement()->GravityScale = initialGravity;
 
 	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
 }
@@ -589,6 +640,14 @@ void ALivreCharacter::EndWallRun(WallRunEnd Why)
 	//  place for camera tilt end
 
 
+}
+
+void ALivreCharacter::Landed(const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CALLING LANDED()"));
+	EventOnLanded();
+	
+	Super::Landed(Hit);
 }
 
 void ALivreCharacter::Move(const FInputActionValue& Value)
