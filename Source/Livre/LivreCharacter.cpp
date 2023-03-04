@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "InputMappingContext.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ALivreCharacter is LUIZZZZZZ
@@ -23,7 +24,7 @@ ALivreCharacter::ALivreCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 		
-	// Create a CameraComponent	
+	// Create a CameraComponent
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
@@ -79,7 +80,7 @@ void ALivreCharacter::BeginPlay()
 
 
  		//jumping
- 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
+ 		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
  		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
  		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
@@ -98,7 +99,7 @@ void ALivreCharacter::BeginPlay()
  		PlayerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
  		PlayerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
  		PlayerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
- 		PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALivreCharacter::CustomJump);
+ 		//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALivreCharacter::CustomJump);
  	}
  }
 
@@ -124,8 +125,11 @@ void ALivreCharacter::LookVertical(float value)
 
 void ALivreCharacter::CustomJump()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Calling CustomJump()"));
+	
 	if (JumpUsed())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Calling Jump()"));
 		Jump();
 
 		if (isWallRunning)
@@ -535,6 +539,8 @@ bool ALivreCharacter::JumpUsed()
 
 void ALivreCharacter::EventJumpReset(int Jumps)
 {
+	UE_LOG(LogTemp, Warning, TEXT("CALLING EVENTJUMPRESET(). New Jump Value = %i"), Jumps);
+
 	jumpLeft = UKismetMathLibrary::Clamp(Jumps, 0, maxJump);
 }
 
@@ -553,7 +559,7 @@ void ALivreCharacter::EventOnLanded()
 {
 	EventJumpReset(maxJump);
 
-	GetCharacterMovement()->GravityScale = initialGravity;
+	//GetCharacterMovement()->GravityScale = initialGravity;
 
 	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
 }
@@ -634,6 +640,14 @@ void ALivreCharacter::EndWallRun(WallRunEnd Why)
 	//  place for camera tilt end
 
 
+}
+
+void ALivreCharacter::Landed(const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CALLING LANDED()"));
+	EventOnLanded();
+	
+	Super::Landed(Hit);
 }
 
 void ALivreCharacter::Move(const FInputActionValue& Value)

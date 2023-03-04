@@ -184,5 +184,5 @@ private:
 	float axisForward;
 
 	// UPROPERTY(EditInstanceOnly)
-	
+	void Landed(const FHitResult& Hit) override;
 };
