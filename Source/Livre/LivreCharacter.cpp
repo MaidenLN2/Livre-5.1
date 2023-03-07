@@ -95,6 +95,10 @@ void ALivreCharacter::BeginPlay()
  		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
  		printf("looking");
 
+		//sprinting
+ 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSprintPressed);
+ 		printf("looking");
+
  		PlayerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
  		PlayerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
  		PlayerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);

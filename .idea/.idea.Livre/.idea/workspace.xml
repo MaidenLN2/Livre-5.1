@@ -5,7 +5,10 @@
     <projectFile>Intermediate/ProjectFiles/UE5.vcxproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bbe29a04-36e7-4b1e-99f4-55eae25bfd20" name="Changes" comment="" />
+    <list default="true" id="bbe29a04-36e7-4b1e-99f4-55eae25bfd20" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Livre/LivreCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Livre/LivreCharacter.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,9 +35,9 @@
   },
   "keyToStringList": {
     "rider.external.source.directories": [
-      "C:\\Users\\YOS.exe\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\YOS.exe\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\YOS.exe\\AppData\\Local\\Symbols\\src"
+      "D:\\Users\\MDS000026E\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "D:\\Users\\MDS000026E\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "D:\\Users\\MDS000026E\\AppData\\Local\\Symbols\\src"
     ]
   }
 }]]></component>
@@ -195,6 +198,7 @@
       <workItem from="1677923716424" duration="78000" />
       <workItem from="1677924401623" duration="510000" />
       <workItem from="1677925793615" duration="1323000" />
+      <workItem from="1678149011326" duration="2272000" />
     </task>
     <servers />
   </component>
