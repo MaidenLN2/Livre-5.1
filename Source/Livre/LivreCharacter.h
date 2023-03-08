@@ -102,6 +102,18 @@ protected:
 		JumpOff
 	};
 
+	//setting enum for slide functionality
+	UENUM(BlueprintType)
+	enum CustomMovementMode
+	{
+		CMOVE_None	UMETA(Hidden),
+		CMOVE_Slide UMETA(DisplayName = "Slide"),
+		CMOVE_MAX	UMETA(Hidden),
+	};
+
+	// transient
+	UPROPERTY(Transient) ALivreCharacter* LivreCharacterOwner;
+
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
