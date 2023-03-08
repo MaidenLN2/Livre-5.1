@@ -197,4 +197,8 @@ private:
 
 	// UPROPERTY(EditInstanceOnly)
 	void Landed(const FHitResult& Hit) override;
+	void EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode);
+	void ExitSlide();
+	bool CanSlide() const;
+	void PhysSlide(float deltaTime, int32 Iterations);
 };

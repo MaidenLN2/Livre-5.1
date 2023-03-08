@@ -654,6 +654,22 @@ void ALivreCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 }
 
+void ALivreCharacter::EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode)
+{
+}
+
+void ALivreCharacter::ExitSlide()
+{
+}
+
+bool ALivreCharacter::CanSlide() const
+{
+}
+
+void ALivreCharacter::PhysSlide(float deltaTime, int32 Iterations)
+{
+}
+
 void ALivreCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
