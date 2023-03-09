@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include <tuple>
 #include "InputActionValue.h"
 #include "LivreCharacter.generated.h"
@@ -111,6 +112,12 @@ protected:
 		CMOVE_MAX	UMETA(Hidden),
 	};
 
+	//additional parametres
+	UPROPERTY(EditDefaultsOnly) float slideMinSpeed = 350;
+	UPROPERTY(EditDefaultsOnly) float slideEnterImpulse = 500;
+	UPROPERTY(EditDefaultsOnly) float slideGravityForce = 5000;
+	UPROPERTY(EditDefaultsOnly) float slideFriction = 1.3;
+	
 	// transient
 	UPROPERTY(Transient) ALivreCharacter* LivreCharacterOwner;
 
@@ -171,6 +178,7 @@ private:
 	FVector wallHeight2;
 	FVector wallNormal2;
 	FVector forwardImpulse;
+	FVector Velocity;
 
 	// bools for wall climbing/running
 	bool aboutToClimb = false;
@@ -179,6 +187,8 @@ private:
 	bool isClimbing = false;
 	bool isSprinting = false;
 	bool isDead = false;
+	bool wantsToCrouch = false;
+	bool orientRotationToMovement = false;
 
 	// floats for wall climbing/running
 	float walkSpeed;
