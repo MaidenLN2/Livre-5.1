@@ -104,7 +104,7 @@ protected:
 	};
 
 	//setting enum for slide functionality
-	UENUM(BlueprintType)
+	//UENUM(BlueprintType)
 	enum CustomMovementMode
 	{
 		CMOVE_None	UMETA(Hidden),
@@ -139,7 +139,7 @@ public:
 	void StopSprint(float NewWalkSpeed = 600.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
-	void ClampHorizontalVelocity();	// Expose to blueprints as this character doesn't have tick for some reason.
+	void ClampHorizontalVelocity();	// expose to blueprints as this character doesn't have tick for some reason
 	
 	// pure functions
 	std::tuple<FVector, int> FindRunDirectionAndSide(FVector InputWallNormal);
@@ -151,12 +151,12 @@ public:
 	// macros
 	bool JumpUsed();
 
-	// events
+	// events functions
 	void EventJumpReset(int Jumps);
 	void EventAnyDamage(float Damage);
 	void EventOnLanded();
 	// collision event
-	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible. Am hoping this overrides its base collision detection
+	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void CapsuleTouched(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -207,7 +207,7 @@ private:
 
 	// UPROPERTY(EditInstanceOnly)
 	void Landed(const FHitResult& Hit) override;
-	void EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode);
+	void EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode);
 	void ExitSlide();
 	bool CanSlide() const;
 	void PhysSlide(float deltaTime, int32 Iterations);

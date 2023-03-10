@@ -7,7 +7,7 @@
   <component name="ChangeListManager">
     <list default="true" id="bbe29a04-36e7-4b1e-99f4-55eae25bfd20" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Livre/Livre.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Livre/Livre.Build.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/Lera_Test.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPerson/Maps/Lera_Test.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/Livre/LivreCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Livre/LivreCharacter.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/Livre/LivreCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Livre/LivreCharacter.h" afterDir="false" />
     </list>
@@ -20,7 +20,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="Toolset" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2Lhfq5gtfiR5xmrBUHzKNlkNADT" />
   <component name="ProjectViewState">
@@ -202,6 +202,7 @@
       <workItem from="1677925793615" duration="1323000" />
       <workItem from="1678149011326" duration="2272000" />
       <workItem from="1678311285343" duration="6610000" />
+      <workItem from="1678396370026" duration="7602000" />
     </task>
     <servers />
   </component>

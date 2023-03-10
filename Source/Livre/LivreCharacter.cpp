@@ -5,14 +5,19 @@
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/InterpToMovementComponent.h" //the one for min tick time
+#include "CharacterMovementComponentAsync.h" // for current floor
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/MovementComponent.h" // for update component etc
+#include "CoreFwd.h" // for some vectors
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "InputMappingContext.h"
 #include "SimModule/SimulationModuleBase.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // ALivreCharacter is LUIZZZZZZ
@@ -41,7 +46,7 @@ ALivreCharacter::ALivreCharacter()
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	// Connecting Collision Detection Functions
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// Might work?
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// might work?
 
 	maxJump = 2;
 }
@@ -655,13 +660,13 @@ void ALivreCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 }
 
-void ALivreCharacter::EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode)
+void ALivreCharacter::EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode)
 {
 	wantsToCrouch = true;
 	orientRotationToMovement = false;
-	Velocity += Chaos::EKinematicTargetMode::Velocity.GetSafeNormal2D() * slideEnterImpulse;
+	Velocity += Velocity.GetSafeNormal2D() * slideEnterImpulse;
 
-	FindFloor(UpdatedComponent->GetComponentLocation(), CurrentFloor, true, NULL);
+	FindFloor(UpdatedComponent->GetComponentLocation(), CurrentFloor, true, NULL); // need to have a separate MovementComponent in order for it to work or  a CharacterMovementComponent reference or pointer
 }
 
 void ALivreCharacter::ExitSlide()
@@ -887,7 +892,7 @@ if (deltaTime < MIN_TICK_TIME)
 	SafeMoveUpdatedComponent(FVector::ZeroVector, NewRotation, false, Hit);
 	
 }
-
+/**/
 void ALivreCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -913,4 +918,3 @@ void ALivreCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
-
