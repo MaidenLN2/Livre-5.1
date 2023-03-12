@@ -206,9 +206,9 @@ private:
 	float axisForward;
 
 	// UPROPERTY(EditInstanceOnly)
-	void Landed(const FHitResult& Hit) override;
-	void EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode);
-	void ExitSlide();
-	bool CanSlide() const;
-	void PhysSlide(float deltaTime, int32 Iterations);
+	// void Landed(const FHitResult& Hit) override;
+	// void EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode);
+	// void ExitSlide();
+	// bool CanSlide() const;
+	// void PhysSlide(float deltaTime, int32 Iterations);
 };
