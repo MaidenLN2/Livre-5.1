@@ -55,6 +55,9 @@ public:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SprintAction;
 	
 	UPROPERTY(BlueprintReadWrite)
 	float sensitivity = 1.0f;
@@ -178,7 +181,7 @@ private:
 	FVector wallHeight2;
 	FVector wallNormal2;
 	FVector forwardImpulse;
-	FVector Velocity;
+	FVector velocity;
 
 	// bools for wall climbing/running
 	bool aboutToClimb = false;
@@ -196,6 +199,9 @@ private:
 	float health;
 	float initialGravity;
 	float fallingGravity;
+
+	//sprint variables
+	float defaultMaxWalkingSpeed = 0.0f;
 
 	// wall running variables
 	FVector wallRunDirection;
