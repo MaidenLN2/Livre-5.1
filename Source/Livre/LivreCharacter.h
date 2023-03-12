@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include <tuple>
 #include "InputActionValue.h"
 #include "LivreCharacter.generated.h"
@@ -102,6 +103,24 @@ protected:
 		JumpOff
 	};
 
+	//setting enum for slide functionality
+	//UENUM(BlueprintType)
+	enum CustomMovementMode
+	{
+		CMOVE_None	UMETA(Hidden),
+		CMOVE_Slide UMETA(DisplayName = "Slide"),
+		CMOVE_MAX	UMETA(Hidden),
+	};
+
+	//additional parametres
+	UPROPERTY(EditDefaultsOnly) float slideMinSpeed = 350;
+	UPROPERTY(EditDefaultsOnly) float slideEnterImpulse = 500;
+	UPROPERTY(EditDefaultsOnly) float slideGravityForce = 5000;
+	UPROPERTY(EditDefaultsOnly) float slideFriction = 1.3;
+	
+	// transient
+	UPROPERTY(Transient) ALivreCharacter* LivreCharacterOwner;
+
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -120,7 +139,7 @@ public:
 	void StopSprint(float NewWalkSpeed = 600.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
-	void ClampHorizontalVelocity();	// Expose to blueprints as this character doesn't have tick for some reason.
+	void ClampHorizontalVelocity();	// expose to blueprints as this character doesn't have tick for some reason
 	
 	// pure functions
 	std::tuple<FVector, int> FindRunDirectionAndSide(FVector InputWallNormal);
@@ -132,12 +151,12 @@ public:
 	// macros
 	bool JumpUsed();
 
-	// events
+	// events functions
 	void EventJumpReset(int Jumps);
 	void EventAnyDamage(float Damage);
 	void EventOnLanded();
 	// collision event
-	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible. Am hoping this overrides its base collision detection
+	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void CapsuleTouched(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -159,6 +178,7 @@ private:
 	FVector wallHeight2;
 	FVector wallNormal2;
 	FVector forwardImpulse;
+	FVector Velocity;
 
 	// bools for wall climbing/running
 	bool aboutToClimb = false;
@@ -167,6 +187,8 @@ private:
 	bool isClimbing = false;
 	bool isSprinting = false;
 	bool isDead = false;
+	bool wantsToCrouch = false;
+	bool orientRotationToMovement = false;
 
 	// floats for wall climbing/running
 	float walkSpeed;
@@ -184,5 +206,9 @@ private:
 	float axisForward;
 
 	// UPROPERTY(EditInstanceOnly)
-	void Landed(const FHitResult& Hit) override;
+	// void Landed(const FHitResult& Hit) override;
+	// void EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode);
+	// void ExitSlide();
+	// bool CanSlide() const;
+	// void PhysSlide(float deltaTime, int32 Iterations);
 };
