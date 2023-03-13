@@ -370,6 +370,17 @@ void ALivreCharacter::CustomVaultingPressed()
 	}
 }
 
+FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
+{
+	FCollisionQueryParams parametres;
+
+	TArray<AActor*> characterChildren;
+	GetAllChildActors(characterChildren);
+	parametres.AddIgnoredActors(characterChildren);
+	parametres.AddIgnoredActor(this);
+	
+}
+
 void ALivreCharacter::StartSprint(float NewSprintSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSprintSpeed;
