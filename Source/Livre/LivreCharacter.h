@@ -55,9 +55,15 @@ public:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
-
+	/** Sprint Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SprintAction;
+	/** Slide Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SlideAction;
+	/** Wallrun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* WallrunAction;
 	
 	UPROPERTY(BlueprintReadWrite)
 	float sensitivity = 1.0f;
@@ -78,9 +84,8 @@ protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
-	/** Called for looking input */
+	/** Called for looking/moving input */
 	void Look(const FInputActionValue& Value);
-
 	void MoveForward(float value);
 	void MoveLateral(float value);
 	void LookHorizontal(float value);
@@ -91,7 +96,7 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
 
-	// ENUMS
+	// Enums
 	enum WallRunSide
 	{
 		Left = 0,
@@ -108,21 +113,21 @@ protected:
 
 	//setting enum for slide functionality
 	//UENUM(BlueprintType)
-	enum CustomMovementMode
-	{
-		CMOVE_None	UMETA(Hidden),
-		CMOVE_Slide UMETA(DisplayName = "Slide"),
-		CMOVE_MAX	UMETA(Hidden),
-	};
+	// enum CustomMovementMode
+	// {
+	// 	CMOVE_None	UMETA(Hidden),
+	// 	CMOVE_Slide UMETA(DisplayName = "Slide"),
+	// 	CMOVE_MAX	UMETA(Hidden),
+	// };
 
-	//additional parametres
-	UPROPERTY(EditDefaultsOnly) float slideMinSpeed = 350;
-	UPROPERTY(EditDefaultsOnly) float slideEnterImpulse = 500;
-	UPROPERTY(EditDefaultsOnly) float slideGravityForce = 5000;
-	UPROPERTY(EditDefaultsOnly) float slideFriction = 1.3;
+	// //additional parametres
+	// UPROPERTY(EditDefaultsOnly) float slideMinSpeed = 350;
+	// UPROPERTY(EditDefaultsOnly) float slideEnterImpulse = 500;
+	// UPROPERTY(EditDefaultsOnly) float slideGravityForce = 5000;
+	// UPROPERTY(EditDefaultsOnly) float slideFriction = 1.3;
 	
 	// transient
-	UPROPERTY(Transient) ALivreCharacter* LivreCharacterOwner;
+	//UPROPERTY(Transient) ALivreCharacter* LivreCharacterOwner;
 
 public:
 	/** Returns Mesh1P subobject **/
@@ -136,6 +141,9 @@ public:
 	void CustomSprintReleased();
 	void CustomSlidePressed();
 	void CustomVaultingPressed();
+
+	//profile collision function
+	FCollisionQueryParams GetIgnoreCharacterParams();
 	
 	//general functions
 	void StartSprint(float NewSprintSpeed = 1000.0f);
@@ -158,6 +166,7 @@ public:
 	void EventJumpReset(int Jumps);
 	void EventAnyDamage(float Damage);
 	void EventOnLanded();
+	
 	// collision event
 	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void CapsuleTouched(
