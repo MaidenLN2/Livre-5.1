@@ -103,6 +103,15 @@ void ALivreCharacter::BeginPlay()
  		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSprintPressed);
  		UE_LOG(LogTemp, Warning, TEXT("sprint custom"));
 
+ 		//sliding
+ 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSlidePressed);
+ 		UE_LOG(LogTemp, Warning, TEXT("slide custom"));
+
+ 		//wallrunning
+ 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Triggered, this, &ALivreCharacter::BeginWallRun);
+ 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Ongoing, this, &ALivreCharacter::UpdateWallRun);
+ 		UE_LOG(LogTemp, Warning, TEXT("wallrun custom"));
+
  		PlayerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
  		PlayerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
  		PlayerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
@@ -378,7 +387,8 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 	GetAllChildActors(characterChildren);
 	parametres.AddIgnoredActors(characterChildren);
 	parametres.AddIgnoredActor(this);
-	
+
+	return parametres;
 }
 
 void ALivreCharacter::StartSprint(float NewSprintSpeed)

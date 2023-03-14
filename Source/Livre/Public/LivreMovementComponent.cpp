@@ -2,6 +2,40 @@
 #include "LivreMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 
+bool ULivreMovementComponent::FSavedMove_Livre::CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const
+{
+	FSavedMove_Livre* NewLivreMove = static_cast<FSavedMove_Livre*>(NewMove.Get());
+
+	if (saved_aboutToSprint != NewLivreMove->saved_aboutToSprint)
+	{
+		return false;
+	}
+	
+	return FSavedMove_Character::CanCombineWith(NewMove, InCharacter, MaxDelta);
+}
+
+void ULivreMovementComponent::FSavedMove_Livre::Clear()
+{
+	FSavedMove_Character::Clear();
+
+	saved_aboutToSprint= 0;
+}
+
+uint8 ULivreMovementComponent::FSavedMove_Livre::GetCompressedFlags() const
+{
+	return FSavedMove_Character::GetCompressedFlags();
+}
+
+void ULivreMovementComponent::FSavedMove_Livre::SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData)
+{
+	FSavedMove_Character::SetMoveFor(C, InDeltaTime, NewAccel, ClientData);
+}
+
+void ULivreMovementComponent::FSavedMove_Livre::PrepMoveFor(ACharacter* C)
+{
+	FSavedMove_Character::PrepMoveFor(C);
+}
+
 void ULivreMovementComponent::EnterSlide()
 {
 	bWantsToCrouch = true; // UE5 bool
@@ -100,12 +134,21 @@ void ULivreMovementComponent::InitializeComponent()
 	Super::InitializeComponent();
 }
 
+uint8 ULivreMovementComponent::GetCompressedFlags() const
+{
+	// uint8 result =FSavedMove_Livre::GetCompressedFlags();
+	// if (saved_aboutToSprint) result |= FLAG_CUSTOM_0;
+
+	// return result;
+	return false;
+}
+
 ULivreMovementComponent::ULivreMovementComponent()
 {
 	LivreCharacterOwner = Cast<ALivreCharacter>(GetOwner());
 }
 
-bool ULivreMovementComponent::isCustomMovementMode(::CustomMovementMode InCustomMovementMode) const
+bool ULivreMovementComponent::isCustomMovementMode(::ECustomMovementMode InCustomMovementMode) const
 {
 	return (MovementMode == MOVE_Custom && CustomMovementMode == InCustomMovementMode);
 }
