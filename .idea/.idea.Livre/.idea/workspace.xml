@@ -11,6 +11,9 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -201,6 +204,7 @@
       <workItem from="1678498523003" duration="1402000" />
       <workItem from="1678588034280" duration="230000" />
       <workItem from="1678656802157" duration="3101000" />
+      <workItem from="1678690063790" duration="13724000" />
     </task>
     <servers />
   </component>
