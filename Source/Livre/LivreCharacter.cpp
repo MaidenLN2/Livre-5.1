@@ -89,27 +89,36 @@ void ALivreCharacter::BeginPlay()
  		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
  		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
  		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
- 		
- 		printf("jumping");
+ 		UE_LOG(LogTemp, Warning, TEXT("jump custom"));
 
 // 		//moving
  		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
- 		printf("moving");
+ 		UE_LOG(LogTemp, Warning, TEXT("moving"));
 
 // 		//looking
  		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
- 		printf("looking");
+ 		UE_LOG(LogTemp, Warning, TEXT("looking"));
 
 		//sprinting
- 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSprintPressed);
- 		printf("looking");
+ 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSprintPressed);
+ 		UE_LOG(LogTemp, Warning, TEXT("sprint custom"));
+
+ 		//sliding
+ 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSlidePressed);
+ 		UE_LOG(LogTemp, Warning, TEXT("slide custom"));
+
+ 		//wallrunning
+ 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Triggered, this, &ALivreCharacter::BeginWallRun);
+ 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Ongoing, this, &ALivreCharacter::UpdateWallRun);
+ 		UE_LOG(LogTemp, Warning, TEXT("wallrun custom"));
 
  		PlayerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
  		PlayerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
  		PlayerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
  		PlayerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
  		//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALivreCharacter::CustomJump);
+ 		//PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALivreCharacter::CustomSprintPressed);
+ 		//PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALivreCharacter::CustomSprintReleased);
  	}
  }
 
@@ -154,14 +163,14 @@ void ALivreCharacter::CustomSprintPressed()
 {
 	isSprinting = true;
 	StartSprint();
-	printf("CustomSprintPressed");
+	UE_LOG(LogTemp, Warning, TEXT("StartSprint from CustomSprintPressed"));
 }
 
 void ALivreCharacter::CustomSprintReleased()
 {
 	isSprinting = false;
 	StopSprint();
-	printf("zcustomSprintReleased");
+	UE_LOG(LogTemp, Warning, TEXT("StopSprint from CustomSprintReleased"));
 }
 
 void ALivreCharacter::CustomSlidePressed()
@@ -368,6 +377,18 @@ void ALivreCharacter::CustomVaultingPressed()
 			}
 		}
 	}
+}
+
+FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
+{
+	FCollisionQueryParams parametres;
+
+	TArray<AActor*> characterChildren;
+	GetAllChildActors(characterChildren);
+	parametres.AddIgnoredActors(characterChildren);
+	parametres.AddIgnoredActor(this);
+
+	return parametres;
 }
 
 void ALivreCharacter::StartSprint(float NewSprintSpeed)
