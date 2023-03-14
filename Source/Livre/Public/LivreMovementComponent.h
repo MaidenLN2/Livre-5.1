@@ -5,7 +5,7 @@
 #include "LivreMovementComponent.generated.h"
 
 UENUM(BlueprintType)
-enum CustomMovementMode
+enum ECustomMovementMode
 {
 	CMOVE_None	UMETA(Hidden),
 	CMOVE_Slide UMETA(DisplayName = "Slide"),
@@ -18,10 +18,24 @@ class ULivreMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
 
-	class FSavedMove_LivreCharacter : FSavedMove_Character
+	class FSavedMove_Livre : public FSavedMove_Character // helper class for keeping state data in movement component per frame
 	{
-		uint8 Saved_bPrevWantsToCrouch:1;
+		FSavedMove_Livre();
+
+		typedef FSavedMove_Character Super;
+
+		uint8 saved_aboutToSprint : 1; // sprint state for switching flags
+
+		virtual bool CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const override;
+		virtual void Clear() override;
+		virtual uint8 GetCompressedFlags() const override;
+		virtual void SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData) override;
+		virtual void PrepMoveFor(ACharacter* C) override;
+		
 	};
+
+	// variable for saving sprint state/checking further in code
+	bool safe_aboutToSprint;
 
 	//move variables for the rest of movement here?
 
@@ -43,10 +57,12 @@ private:
 protected:
 virtual void InitializeComponent() override;
 
+	virtual uint8 GetCompressedFlags() const /*override*/;
+
 public:
 	ULivreMovementComponent();
 
 	// for changing movement mode
-	UFUNCTION(BlueprintPure) bool isCustomMovementMode(enum CustomMovementMode InCustomMovementMode) const;
+	UFUNCTION(BlueprintPure) bool isCustomMovementMode(enum ECustomMovementMode InCustomMovementMode) const;
 	
 };
