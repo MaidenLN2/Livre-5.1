@@ -137,10 +137,13 @@ public:
 	
 	// InputAction Overrides
 	void CustomJump();
+	void CustomJumpEnded();
 	void CustomSprintPressed();
 	void CustomSprintReleased();
 	void CustomSlidePressed();
+	void CustomSlideReleased();
 	void CustomVaultingPressed();
+	void CustomVaultingReleased();
 
 	//profile collision function
 	FCollisionQueryParams GetIgnoreCharacterParams();
@@ -179,6 +182,7 @@ public:
 		);
 	// ervents continued
 	void BeginWallRun();
+	void CallEndWallRun();
 	void EndWallRun(WallRunEnd Why);
 	
 private:
@@ -216,7 +220,7 @@ private:
 	FVector wallRunDirection;
 	bool isWallRunning;
 	int jumpLeft;
-	int maxJump;
+	const int maxJump = 2;
 	float axisRight;
 	float axisForward;
 
