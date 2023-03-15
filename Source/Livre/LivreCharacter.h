@@ -153,7 +153,7 @@ public:
 	void EventAnyDamage(float Damage);
 	void EventOnLanded();
 	
-	// collision event
+	// sule collision event
 	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void CapsuleTouched(
 		UPrimitiveComponent* OverlappedComponent,
@@ -206,11 +206,5 @@ private:
 	const int maxJump = 2;
 	float axisRight;
 	float axisForward;
-
-	// UPROPERTY(EditInstanceOnly)
-	// void Landed(const FHitResult& Hit) override;
-	// void EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode);
-	// void ExitSlide();
-	// bool CanSlide() const;
-	// void PhysSlide(float deltaTime, int32 Iterations);
+	
 };
