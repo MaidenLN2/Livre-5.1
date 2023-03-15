@@ -15,8 +15,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "InputMappingContext.h"
 #include "SimModule/SimulationModuleBase.h"
+#include "InputMappingContext.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,8 +47,6 @@ ALivreCharacter::ALivreCharacter()
 
 	// Connecting Collision Detection Functions
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// might work?
-
-	maxJump = 2;
 }
 
 void ALivreCharacter::BeginPlay()
@@ -83,33 +81,35 @@ void ALivreCharacter::BeginPlay()
  	// set up action bindings
  	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
  	{
-
-
  		//jumping
  		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
- 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomJump);
- 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+ 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomJump);
+ 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomJumpEnded);	// This was just an update to what the function did, it now allows for jumps to reset
  		UE_LOG(LogTemp, Warning, TEXT("jump custom"));
 
 // 		//moving
- 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Move);
+ 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &ALivreCharacter::Move);
  		UE_LOG(LogTemp, Warning, TEXT("moving"));
 
 // 		//looking
- 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALivreCharacter::Look);
+ 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Started, this, &ALivreCharacter::Look);
  		UE_LOG(LogTemp, Warning, TEXT("looking"));
 
 		//sprinting
- 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSprintPressed);
+ 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSprintPressed);
+ 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSprintReleased);	// Stops the player from sprinting
  		UE_LOG(LogTemp, Warning, TEXT("sprint custom"));
 
  		//sliding
- 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Triggered, this, &ALivreCharacter::CustomSlidePressed);
+ 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
+ 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
  		UE_LOG(LogTemp, Warning, TEXT("slide custom"));
 
  		//wallrunning
- 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Triggered, this, &ALivreCharacter::BeginWallRun);
+ 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Ongoing, this, &ALivreCharacter::UpdateWallRun);
+ 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Completed, this, &ALivreCharacter::CallEndWallRun);
+ 		// ^Calls EndWallRun early so that the wallrun button has to be held in order for the player to continue wallrunning
  		UE_LOG(LogTemp, Warning, TEXT("wallrun custom"));
 
  		PlayerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
@@ -159,18 +159,37 @@ void ALivreCharacter::CustomJump()
 	printf("CustomJump()");
 }
 
+void ALivreCharacter::CustomJumpEnded()
+{
+	if (jumpLeft == 0)
+	{
+		FTimerHandle ResetJumps;
+		GetWorld()->GetTimerManager().SetTimer(ResetJumps, [&]()
+		{
+			EventJumpReset(maxJump);
+		}, 0.25f, false);
+	}
+	StopJumping();
+}
+
 void ALivreCharacter::CustomSprintPressed()
 {
+	if (!isSprinting)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StartSprint from CustomSprintPressed"));
+	}
 	isSprinting = true;
 	StartSprint();
-	UE_LOG(LogTemp, Warning, TEXT("StartSprint from CustomSprintPressed"));
 }
 
 void ALivreCharacter::CustomSprintReleased()
 {
+	if (isSprinting)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StopSprint from CustomSprintReleased"));
+	}
 	isSprinting = false;
 	StopSprint();
-	UE_LOG(LogTemp, Warning, TEXT("StopSprint from CustomSprintReleased"));
 }
 
 void ALivreCharacter::CustomSlidePressed()
@@ -178,32 +197,42 @@ void ALivreCharacter::CustomSlidePressed()
 	if (isSprinting && !GetCharacterMovement()->IsFalling())
 	{
 		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
-		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-		AddMovementInput(FVector(), 200.0f, false);
+	LaunchCharacter(GetActorForwardVector() * 1000.0f, true, false);
+		// AddMovementInput(GetActorForwardVector(), 200.0f, false);
 
 
 		// Sliding Anim Goes Here
 		//float Duration = PlayAnimMontage(/*Insert Anim Montage Here*/);
-		float Duration = 5.0f;
-
-		FTimerHandle CSP_TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(CSP_TimerHandle, [&]()
-		{
-			UKismetSystemLibrary::PrintString(this, "Sliding Happened After Animation");
-			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-
-			FTimerHandle CSP_InternalTimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(CSP_InternalTimerHandle, [&]()
-			{
-				GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
-			}, 0.5f, false);
-		}, Duration, false);
+		
+		// float Duration = 5.0f;
+		//
+		// FTimerHandle CSP_TimerHandle;
+		// GetWorld()->GetTimerManager().SetTimer(CSP_TimerHandle, [&]()
+		// {
+		// 	CustomSlidePressed();
+		// }, Duration, false);
 	}
-	printf("custom slide pressed");
+	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
+}
+
+void ALivreCharacter::CustomSlideReleased()
+{
+
+	UKismetSystemLibrary::PrintString(this, "Sliding Happened After Animation");
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	FTimerHandle CSP_InternalTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(CSP_InternalTimerHandle, [&]()
+	{
+		GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
+	}, 0.5f, false);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
 }
 
 void ALivreCharacter::CustomVaultingPressed()
@@ -377,6 +406,10 @@ void ALivreCharacter::CustomVaultingPressed()
 			}
 		}
 	}
+}
+
+void ALivreCharacter::CustomVaultingReleased()
+{
 }
 
 FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
@@ -570,7 +603,7 @@ bool ALivreCharacter::JumpUsed()
 
 void ALivreCharacter::EventJumpReset(int Jumps)
 {
-	UE_LOG(LogTemp, Warning, TEXT("CALLING EVENTJUMPRESET(). New Jump Value = %i"), Jumps);
+	//UE_LOG(LogTemp, Warning, TEXT("CALLING EVENTJUMPRESET(). New Jump Value = %i"), Jumps);
 
 	jumpLeft = UKismetMathLibrary::Clamp(Jumps, 0, maxJump);
 }
@@ -590,7 +623,7 @@ void ALivreCharacter::EventOnLanded()
 {
 	EventJumpReset(maxJump);
 
-	//GetCharacterMovement()->GravityScale = initialGravity;
+	GetCharacterMovement()->GravityScale = initialGravity;
 
 	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
 }
@@ -635,285 +668,82 @@ void ALivreCharacter::CapsuleTouched(
 void ALivreCharacter::BeginWallRun()
 {
 	// sequence 0
-	FTimerHandle BWR_Delayhandle;
-	GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
+	if (!isWallRunning)	// This check makes sure the function isn't called multiple times on activation. Once it activates once, it prevents it from starting again.
 	{
-		// call End Wall Run
-	}, 2, false);
+		// Added check in here to see if the player is next to a wall before deciding to activate the wallrun.
+		// Doesn't check for sides atm.
+		FHitResult HitResultCapture;
+		FVector TraceEnd = GetActorLocation() + (GetActorRightVector() * (250 * (WallRunSide == Left ? 1 : -1)));
+		bool LineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
+			this,
+			GetActorLocation(),
+			TraceEnd,
+			UEngineTypes::ConvertToTraceType(ECC_Visibility),
+			false,
+			TArray<AActor*>(),
+			EDrawDebugTrace::Persistent,
+			HitResultCapture,
+			true
+			);
+
+		// If we did detect a line trace, perform the function and let's wallrun!
+		if (LineTraceDidHit)
+		{
+			FTimerHandle BWR_Delayhandle;
+			GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
+			{
+				// call End Wall Run
+				EndWallRun(FallOff);
+			}, 2, false);
 	
-	// sequence 1
-	GetCharacterMovement()->AirControl = 1.0f;
-	GetCharacterMovement()->GravityScale = 0.0f;
+			// sequence 1 where player runs on walls
+			GetCharacterMovement()->AirControl = 1.0f;
+			GetCharacterMovement()->GravityScale = 0.0f;
 
-	isWallRunning = true;
-	//  place for camera tilt begin
+			isWallRunning = true;
+			//  place for camera tilt begin
 
-	// Timeline the UpdateWallRun function for 5 seconds
+			// Timeline the UpdateWallRun function for 5 seconds
+		}
+	}
+}
+
+/**
+ * @brief Function explicitly to work within the EnhancedInputComponent as binding functions to actions requires they do not have variables to enter, for now.
+ */
+void ALivreCharacter::CallEndWallRun()
+{
+	if (isWallRunning)
+	{
+		EndWallRun(FallOff);
+	}
 }
 
 void ALivreCharacter::EndWallRun(WallRunEnd Why)
 {
-	switch (Why)
+	if (isWallRunning) // we only want to stop the wallrunning if it's already started
 	{
-	case FallOff:
-		EventJumpReset(1);
-		break;
-	case JumpOff:
-		EventJumpReset(maxJump);
-		break;
-	default: ;
-	}
+		switch (Why)
+		{
+		case FallOff:
+			EventJumpReset(1);
+			break;
+		case JumpOff:
+			EventJumpReset(maxJump);
+			break;
+		default: ;
+		}
 
-	GetCharacterMovement()->AirControl = 0.05f;
-	GetCharacterMovement()->GravityScale = 1.0f;
-	isWallRunning = false;
+		GetCharacterMovement()->AirControl = 0.05f;
+		GetCharacterMovement()->GravityScale = 1.0f; // why not working?
+		isWallRunning = false;
+	}
 
 	//  place for camera tilt end
 
 
 }
 
-// void ALivreCharacter::Landed(const FHitResult& Hit)
-// {
-// 	UE_LOG(LogTemp, Warning, TEXT("CALLING LANDED()"));
-// 	EventOnLanded();
-// 	
-// 	Super::Landed(Hit);
-// }
-//
-// void ALivreCharacter::EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode)
-// {
-// 	wantsToCrouch = true;
-// 	orientRotationToMovement = false;
-// 	Velocity += Velocity.GetSafeNormal2D() * slideEnterImpulse;
-//
-// 	FindFloor(UpdatedComponent->GetComponentLocation(), CurrentFloor, true, NULL); // need to have a separate MovementComponent in order for it to work or  a CharacterMovementComponent reference or pointer
-// }
-//
-// void ALivreCharacter::ExitSlide()
-// {
-// 	wantsToCrouch = false;
-// 	orientRotationToMovement = true;
-// }
-//
-// bool ALivreCharacter::CanSlide() const
-// {
-// 	FVector Start = UpdatedComponent->GetComponentLocation();
-// 	FVector End = Start + CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.5f * FVector::DownVector;
-// 	FName ProfileName = TEXT("BlockAll");
-// 	bool validSurface = GetWorld()->LineTraceTestByProfile(Start, End, ProfileName, LivreCharacterOwner->GetIgnoreCharacterParams());
-// 	bool enoughSpeed = Velocity.SizeSquared() > pow(MinSlideSpeed, 2);
-// 	
-// 	return validSurface && enoughSpeed;
-// }
-//
-// void ALivreCharacter::PhysSlide(float deltaTime, int32 Iterations)
-// {
-// if (deltaTime < MIN_TICK_TIME)
-// 	{
-// 		return;
-// 	}
-//
-// 	
-// 	if (!CanSlide())
-// 	{
-// 		SetMovementMode(MOVE_Walking);
-// 		StartNewPhysics(deltaTime, Iterations);
-// 		return;
-// 	}
-//
-// 	bool justTeleported = false;
-// 	bool checkedFall = false;
-// 	bool triedLedgeMove = false;
-// 	float remainingTime = deltaTime;
-//
-// 	// Perform the move
-// 	while ( (remainingTime >= MIN_TICK_TIME) && (Iterations < MaxSimulationIterations) && CharacterOwner && (CharacterOwner->Controller || bRunPhysicsWithNoController || (CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)) )
-// 	{
-// 		Iterations++;
-// 		justTeleported = false;
-// 		const float timeTick = GetSimulationTimeStep(remainingTime, Iterations);
-// 		remainingTime -= timeTick;
-//
-// 		// Save current values
-// 		UPrimitiveComponent * const OldBase = GetMovementBase();
-// 		const FVector PreviousBaseLocation = (OldBase != NULL) ? OldBase->GetComponentLocation() : FVector::ZeroVector;
-// 		const FVector OldLocation = UpdatedComponent->GetComponentLocation();
-// 		const FFindFloorResult OldFloor = CurrentFloor;
-//
-// 		// Ensure velocity is horizontal.
-// 		MaintainHorizontalGroundVelocity();
-// 		const FVector OldVelocity = Velocity;
-//
-// 		FVector SlopeForce = CurrentFloor.HitResult.Normal;
-// 		SlopeForce.Z = 0.f;
-// 		Velocity += SlopeForce * SlideGravityForce * deltaTime;
-// 		
-// 		Acceleration = Acceleration.ProjectOnTo(UpdatedComponent->GetRightVector().GetSafeNormal2D());
-//
-// 		// Apply acceleration
-// 		CalcVelocity(timeTick, GroundFriction * SlideFrictionFactor, false, GetMaxBrakingDeceleration());
-// 		
-// 		// Compute move parameters
-// 		const FVector MoveVelocity = Velocity;
-// 		const FVector Delta = timeTick * MoveVelocity;
-// 		const bool zeroDelta = Delta.IsNearlyZero();
-// 		FStepDownResult StepDownResult;
-// 		bool floorWalkable = CurrentFloor.isWalkableFloor();
-//
-// 		if ( zeroDelta )
-// 		{
-// 			remainingTime = 0.f;
-// 		}
-// 		else
-// 		{
-// 			// try to move forward
-// 			MoveAlongFloor(MoveVelocity, timeTick, &StepDownResult);
-//
-// 			if ( isFalling() )
-// 			{
-// 				// pawn decided to jump up
-// 				const float DesiredDist = Delta.Size();
-// 				if (DesiredDist > KINDA_SMALL_NUMBER)
-// 				{
-// 					const float ActualDist = (UpdatedComponent->GetComponentLocation() - OldLocation).Size2D();
-// 					remainingTime += timeTick * (1.f - FMath::Min(1.f,ActualDist/DesiredDist));
-// 				}
-// 				StartNewPhysics(remainingTime,Iterations);
-// 				return;
-// 			}
-// 			else if ( isSwimming() ) //just entered water
-// 			{
-// 				StartSwimming(OldLocation, OldVelocity, timeTick, remainingTime, Iterations);
-// 				return;
-// 			}
-// 		}
-//
-// 		// Update floor.
-// 		// StepUp might have already done it for us.
-// 		if (StepDownResult.bComputedFloor)
-// 		{
-// 			CurrentFloor = StepDownResult.FloorResult;
-// 		}
-// 		else
-// 		{
-// 			FindFloor(UpdatedComponent->GetComponentLocation(), CurrentFloor, bZeroDelta, NULL);
-// 		}
-//
-//
-// 		// check for ledges here
-// 		const bool checkLedges = !CanWalkOffLedges();
-// 		if ( checkLedges && !CurrentFloor.IsWalkableFloor() )
-// 		{
-// 			// calculate possible alternate movement
-// 			const FVector GravDir = FVector(0.f,0.f,-1.f);
-// 			const FVector NewDelta = triedLedgeMove ? FVector::ZeroVector : GetLedgeMove(OldLocation, Delta, GravDir);
-// 			if ( !NewDelta.IsZero() )
-// 			{
-// 				// first revert this move
-// 				RevertMove(OldLocation, OldBase, PreviousBaseLocation, OldFloor, false);
-//
-// 				// avoid repeated ledge moves if the first one fails
-// 				triedLedgeMove = true;
-//
-// 				// Try new movement direction
-// 				Velocity = NewDelta / timeTick;
-// 				remainingTime += timeTick;
-// 				continue;
-// 			}
-// 			else
-// 			{
-// 				// see if it is OK to jump
-// 				// @todo collision : only thing that can be problem is that oldbase has world collision on
-// 				bool bMustJump = zeroDelta || (OldBase == NULL || (!OldBase->IsQueryCollisionEnabled() && MovementBaseUtility::IsDynamicBase(OldBase)));
-// 				if ( (bMustJump || !checkedFall) && CheckFall(OldFloor, CurrentFloor.HitResult, Delta, OldLocation, remainingTime, timeTick, Iterations, bMustJump) )
-// 				{
-// 					return;
-// 				}
-// 				checkedFall = true;
-//
-// 				// revert this move
-// 				RevertMove(OldLocation, OldBase, PreviousBaseLocation, OldFloor, true);
-// 				remainingTime = 0.f;
-// 				break;
-// 			}
-// 		}
-// 		else
-// 		{
-// 			// Validate the floor check
-// 			if (CurrentFloor.IsWalkableFloor())
-// 			{
-// 				if (ShouldCatchAir(OldFloor, CurrentFloor))
-// 				{
-// 					HandleWalkingOffLedge(OldFloor.HitResult.ImpactNormal, OldFloor.HitResult.Normal, OldLocation, timeTick);
-// 					if (isMovingOnGround())
-// 					{
-// 						// If still walking, then fall. If not, assume the user set a different mode they want to keep.
-// 						StartFalling(Iterations, remainingTime, timeTick, Delta, OldLocation);
-// 					}
-// 					return;
-// 				}
-//
-// 				AdjustFloorHeight();
-// 				SetBase(CurrentFloor.HitResult.Component.Get(), CurrentFloor.HitResult.BoneName);
-// 			}
-// 			else if (CurrentFloor.HitResult.bStartPenetrating && remainingTime <= 0.f)
-// 			{
-// 				// The floor check failed because it started in penetration
-// 				// We do not want to try to move downward because the downward sweep failed, rather we'd like to try to pop out of the floor.
-// 				FHitResult Hit(CurrentFloor.HitResult);
-// 				Hit.TraceEnd = Hit.TraceStart + FVector(0.f, 0.f, MAX_FLOOR_DIST);
-// 				const FVector RequestedAdjustment = GetPenetrationAdjustment(Hit);
-// 				ResolvePenetration(RequestedAdjustment, Hit, UpdatedComponent->GetComponentQuat());
-// 				forceNextFloorCheck = true;
-// 			}
-//
-// 			// check if just entered water
-// 			if ( isSwimming() )
-// 			{
-// 				StartSwimming(OldLocation, Velocity, timeTick, remainingTime, Iterations);
-// 				return;
-// 			}
-//
-// 			// See if we need to start falling.
-// 			if (!CurrentFloor.IsWalkableFloor() && !CurrentFloor.HitResult.bStartPenetrating)
-// 			{
-// 				const bool bMustJump = bJustTeleported || bZeroDelta || (OldBase == NULL || (!OldBase->IsQueryCollisionEnabled() && MovementBaseUtility::IsDynamicBase(OldBase)));
-// 				if ((bMustJump || !bCheckedFall) && CheckFall(OldFloor, CurrentFloor.HitResult, Delta, OldLocation, remainingTime, timeTick, Iterations, bMustJump) )
-// 				{
-// 					return;
-// 				}
-// 				checkedFall = true;
-// 			}
-// 		}
-// 		
-// 		// Allow overlap events and such to change physics state and velocity
-// 		if (isMovingOnGround() && floorWalkable)
-// 		{
-// 			// Make velocity reflect actual move
-// 			if( !justTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() && timeTick >= MIN_TICK_TIME)
-// 			{
-// 				// TODO-RootMotionSource: Allow this to happen during partial override Velocity, but only set allowed axes?
-// 				Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / timeTick;
-// 				MaintainHorizontalGroundVelocity();
-// 			}
-// 		}
-//
-// 		// If we didn't move at all this iteration then abort (since future iterations will also be stuck).
-// 		if (UpdatedComponent->GetComponentLocation() == OldLocation)
-// 		{
-// 			remainingTime = 0.f;
-// 			break;
-// 		}
-// 	}
-//
-//
-// 	FHitResult Hit;
-// 	FQuat NewRotation = FRotationMatrix::MakeFromXZ(Velocity.GetSafeNormal2D(), FVector::UpVector).ToQuat();
-// 	SafeMoveUpdatedComponent(FVector::ZeroVector, NewRotation, false, Hit);
-// 	
-// }
-/**/
 void ALivreCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
