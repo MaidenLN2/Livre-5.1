@@ -201,7 +201,7 @@ void ALivreCharacter::CustomSlidePressed()
 		
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	LaunchCharacter(GetActorForwardVector() * 1000.0f, true, false);
+	LaunchCharacter(GetActorForwardVector() * 2000.0f, true, false);
 		// AddMovementInput(GetActorForwardVector(), 200.0f, false);
 
 

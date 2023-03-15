@@ -111,23 +111,6 @@ protected:
 		JumpOff
 	};
 
-	//setting enum for slide functionality
-	//UENUM(BlueprintType)
-	// enum CustomMovementMode
-	// {
-	// 	CMOVE_None	UMETA(Hidden),
-	// 	CMOVE_Slide UMETA(DisplayName = "Slide"),
-	// 	CMOVE_MAX	UMETA(Hidden),
-	// };
-
-	// //additional parametres
-	// UPROPERTY(EditDefaultsOnly) float slideMinSpeed = 350;
-	// UPROPERTY(EditDefaultsOnly) float slideEnterImpulse = 500;
-	// UPROPERTY(EditDefaultsOnly) float slideGravityForce = 5000;
-	// UPROPERTY(EditDefaultsOnly) float slideFriction = 1.3;
-	
-	// transient
-	//UPROPERTY(Transient) ALivreCharacter* LivreCharacterOwner;
 
 public:
 	/** Returns Mesh1P subobject **/
@@ -180,7 +163,7 @@ public:
 		bool bFromSweep,
 		const FHitResult &SweepResult
 		);
-	// ervents continued
+	// wall events continued
 	void BeginWallRun();
 	void CallEndWallRun();
 	void EndWallRun(WallRunEnd Why);
