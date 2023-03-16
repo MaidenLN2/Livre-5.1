@@ -81,31 +81,31 @@ void ALivreCharacter::BeginPlay()
  	// set up action bindings
  	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
  	{
- 		//jumping
+ 		//Jumping
  		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);	// Original for Storage
  		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomJump);
  		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomJumpEnded);	// This was just an update to what the function did, it now allows for jumps to reset
  		UE_LOG(LogTemp, Warning, TEXT("jump custom"));
 
-// 		//moving
+// 		//Moving
  		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &ALivreCharacter::Move);
  		UE_LOG(LogTemp, Warning, TEXT("moving"));
 
-// 		//looking
+// 		//Looking
  		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Started, this, &ALivreCharacter::Look);
  		UE_LOG(LogTemp, Warning, TEXT("looking"));
 
-		//sprinting
+		//Sprinting
  		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSprintPressed);
  		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSprintReleased);	// Stops the player from sprinting
  		UE_LOG(LogTemp, Warning, TEXT("sprint custom"));
 
- 		//sliding
+ 		//Sliding
  		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
  		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
  		UE_LOG(LogTemp, Warning, TEXT("slide custom"));
 
- 		//wallrunning
+ 		//Wallrunning
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Ongoing, this, &ALivreCharacter::UpdateWallRun);
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Completed, this, &ALivreCharacter::CallEndWallRun);
@@ -122,6 +122,7 @@ void ALivreCharacter::BeginPlay()
  	}
  }
 
+// Moving/looking functionality 
 void ALivreCharacter::MoveForward(float value)
 {
 	AddMovementInput(RootComponent->GetForwardVector(), FMath::Clamp(value, -1.0f, 1.0f));
@@ -142,6 +143,7 @@ void ALivreCharacter::LookVertical(float value)
 	AddControllerPitchInput(-value * sensitivity);
 }
 
+// Custom jump for wall running
 void ALivreCharacter::CustomJump()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Calling CustomJump()"));
@@ -159,6 +161,7 @@ void ALivreCharacter::CustomJump()
 	printf("CustomJump()");
 }
 
+// What happens after jump ends
 void ALivreCharacter::CustomJumpEnded()
 {
 	if (jumpLeft == 0)
@@ -171,7 +174,7 @@ void ALivreCharacter::CustomJumpEnded()
 	}
 	StopJumping();
 }
-
+// Sprinting functionality
 void ALivreCharacter::CustomSprintPressed()
 {
 	if (!isSprinting)
@@ -191,7 +194,7 @@ void ALivreCharacter::CustomSprintReleased()
 	isSprinting = false;
 	StopSprint();
 }
-
+//Sliding functionality
 void ALivreCharacter::CustomSlidePressed()
 {
 	if (isSprinting && !GetCharacterMovement()->IsFalling())
@@ -234,7 +237,9 @@ void ALivreCharacter::CustomSlideReleased()
 	
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
 }
+// Vaulting functionality
 
+// start vaulting
 void ALivreCharacter::CustomVaultingPressed()
 {
 	FVector StartPos = GetActorLocation() - FVector(0.0, 0.0, 44.0);
@@ -382,7 +387,6 @@ void ALivreCharacter::CustomVaultingPressed()
 				float Duration;
 				if (wallIsThicc)
 				{
-					// NOTICE 
 					// getting Up Animation goes here
 					// Duration = PlayAnimMontage();
 					Duration = 4.0f;
@@ -407,11 +411,11 @@ void ALivreCharacter::CustomVaultingPressed()
 		}
 	}
 }
-
+//End vaulting
 void ALivreCharacter::CustomVaultingReleased()
 {
 }
-
+// Custom collision profile
 FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 {
 	FCollisionQueryParams parametres;
@@ -423,26 +427,28 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 
 	return parametres;
 }
-
+// Setting running speed
 void ALivreCharacter::StartSprint(float NewSprintSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSprintSpeed;
 	printf("start sprint");
 }
-
+// Changing sprinting speed to walking speed
 void ALivreCharacter::StopSprint(float NewWalkSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewWalkSpeed;
 	printf("stop sprint");
 }
 
-void ALivreCharacter::SetHorizontalVelocity(float velocityX, float velocityY)
+// Setting movement velocity
+ void ALivreCharacter::SetHorizontalVelocity(float velocityX, float velocityY)
 {
 	float z = GetCharacterMovement()->Velocity.Z;
 	GetCharacterMovement()->Velocity = FVector(velocityX, velocityY, z);
 	printf("set horizontal velocity");
 }
 
+// What is happening during actual wall run (math)
 void ALivreCharacter::UpdateWallRun()
 {
     if (AreKeysRequired())
@@ -572,7 +578,7 @@ bool ALivreCharacter::AreKeysRequired()
         switch (WallRunSide)
         {
         case Left:
-            return axisRight > 0.1f;
+            return axisLeft > 0.1f;
         case Right:
             return axisRight < 0.1f;
         default: ;
