@@ -20,7 +20,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-// ALivreCharacter is LUIZZZZZZ
+// ALivreCharacter is LUIZZZZZZ he jumps and runs
 
 ALivreCharacter::ALivreCharacter()
 {
@@ -105,7 +105,7 @@ void ALivreCharacter::BeginPlay()
  		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
  		UE_LOG(LogTemp, Warning, TEXT("slide custom"));
 
- 		//Wallrunning
+ 		//Wall running
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Ongoing, this, &ALivreCharacter::UpdateWallRun);
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Completed, this, &ALivreCharacter::CallEndWallRun);
@@ -237,7 +237,7 @@ void ALivreCharacter::CustomSlideReleased()
 	
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
 }
-// Vaulting functionality
+// Vaulting functionality (in progress)
 
 // start vaulting
 void ALivreCharacter::CustomVaultingPressed()
@@ -570,7 +570,7 @@ FVector ALivreCharacter::LaunchVelocity()
     // sequence 1
     return (LaunchDirection + FVector(0, 0, 1)) * GetCharacterMovement()->JumpZVelocity;
 }
-
+// Conditional function to check if there is wall on left or right and start/end wall running
 bool ALivreCharacter::AreKeysRequired()
 {
     if (axisForward > 0.1f)
@@ -578,7 +578,7 @@ bool ALivreCharacter::AreKeysRequired()
         switch (WallRunSide)
         {
         case Left:
-            return axisLeft > 0.1f;
+            return axisRight > 0.1f;
         case Right:
             return axisRight < 0.1f;
         default: ;
@@ -587,13 +587,13 @@ bool ALivreCharacter::AreKeysRequired()
 	printf("are keys required");
     return false;
 }
-
+// It gets horizontal velocity for wall running
 FVector2d ALivreCharacter::GetHorizontalVelocity()
 {
 	printf("get horizontal velocity");
     return FVector2d(GetCharacterMovement()->GetLastUpdateVelocity());
 }
-
+// Conditional jump fucntion where player uses one of limited jump in order to prevent player from endless jumping and breaking the game
 bool ALivreCharacter::JumpUsed()
 {
 	if (isWallRunning)	return true;
@@ -606,14 +606,14 @@ bool ALivreCharacter::JumpUsed()
 	printf("jump used");
 	return false;
 }
-
+// Resets number of jumps availab;e
 void ALivreCharacter::EventJumpReset(int Jumps)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("CALLING EVENTJUMPRESET(). New Jump Value = %i"), Jumps);
 
 	jumpLeft = UKismetMathLibrary::Clamp(Jumps, 0, maxJump);
 }
-
+// Damage dealt to player, if 0 ends the game
 void ALivreCharacter::EventAnyDamage(float Damage)
 {
 	health -= Damage;
@@ -624,7 +624,7 @@ void ALivreCharacter::EventAnyDamage(float Damage)
 		UGameplayStatics::OpenLevel(this, FName("Main_Menu"));
 	}
 }
-
+// What happens after player lands on surface
 void ALivreCharacter::EventOnLanded()
 {
 	EventJumpReset(maxJump);
@@ -633,7 +633,7 @@ void ALivreCharacter::EventOnLanded()
 
 	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
 }
-
+// What happens when capsule touches the wall, how it attaches and conditions 
 void ALivreCharacter::CapsuleTouched(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
@@ -674,10 +674,10 @@ void ALivreCharacter::CapsuleTouched(
 void ALivreCharacter::BeginWallRun()
 {
 	// sequence 0
-	if (!isWallRunning)	// This check makes sure the function isn't called multiple times on activation. Once it activates once, it prevents it from starting again.
+	if (!isWallRunning)	// makes sure the function isn't called multiple times on activation
 	{
-		// Added check in here to see if the player is next to a wall before deciding to activate the wallrun.
-		// Doesn't check for sides atm.
+		// check in here to see if the player is next to a wall before deciding to activate the wall run
+		// doesn't check for sides atm
 		FHitResult HitResultCapture;
 		FVector TraceEnd = GetActorLocation() + (GetActorRightVector() * (250 * (WallRunSide == Left ? 1 : -1)));
 		bool LineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
@@ -692,7 +692,7 @@ void ALivreCharacter::BeginWallRun()
 			true
 			);
 
-		// If we did detect a line trace, perform the function and let's wallrun!
+		// when the check for wall is check and allows to run
 		if (LineTraceDidHit)
 		{
 			FTimerHandle BWR_Delayhandle;
@@ -708,15 +708,12 @@ void ALivreCharacter::BeginWallRun()
 
 			isWallRunning = true;
 			//  place for camera tilt begin
-
-			// Timeline the UpdateWallRun function for 5 seconds
+			
 		}
 	}
 }
 
-/**
- * @brief Function explicitly to work within the EnhancedInputComponent as binding functions to actions requires they do not have variables to enter, for now.
- */
+// Ending wall run
 void ALivreCharacter::CallEndWallRun()
 {
 	if (isWallRunning)
@@ -724,10 +721,10 @@ void ALivreCharacter::CallEndWallRun()
 		EndWallRun(FallOff);
 	}
 }
-
+// Detects why wall run ended (2 reasons why)
 void ALivreCharacter::EndWallRun(WallRunEnd Why)
 {
-	if (isWallRunning) // we only want to stop the wallrunning if it's already started
+	if (isWallRunning) // we only want to stop the wallr unning if it's already started
 	{
 		switch (Why)
 		{
@@ -741,7 +738,7 @@ void ALivreCharacter::EndWallRun(WallRunEnd Why)
 		}
 
 		GetCharacterMovement()->AirControl = 0.05f;
-		GetCharacterMovement()->GravityScale = 1.0f; // why not working?
+		GetCharacterMovement()->GravityScale = 1.0f; 
 		isWallRunning = false;
 	}
 
@@ -749,10 +746,10 @@ void ALivreCharacter::EndWallRun(WallRunEnd Why)
 
 
 }
-
+// Movement
 void ALivreCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
+	// input is a Vector2D for simplicity of calculations
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
@@ -762,10 +759,11 @@ void ALivreCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
 }
-
+// Looking using mouse
 void ALivreCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
+	// input is a Vector2D for the same reasona as above
+	
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)

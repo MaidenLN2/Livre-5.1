@@ -205,7 +205,6 @@ private:
 	int jumpLeft;
 	const int maxJump = 2;
 	float axisRight;
-	float axisLeft;
 	float axisForward;
 	
 };
