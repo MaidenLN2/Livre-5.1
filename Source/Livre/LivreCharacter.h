@@ -111,23 +111,6 @@ protected:
 		JumpOff
 	};
 
-	//setting enum for slide functionality
-	//UENUM(BlueprintType)
-	// enum CustomMovementMode
-	// {
-	// 	CMOVE_None	UMETA(Hidden),
-	// 	CMOVE_Slide UMETA(DisplayName = "Slide"),
-	// 	CMOVE_MAX	UMETA(Hidden),
-	// };
-
-	// //additional parametres
-	// UPROPERTY(EditDefaultsOnly) float slideMinSpeed = 350;
-	// UPROPERTY(EditDefaultsOnly) float slideEnterImpulse = 500;
-	// UPROPERTY(EditDefaultsOnly) float slideGravityForce = 5000;
-	// UPROPERTY(EditDefaultsOnly) float slideFriction = 1.3;
-	
-	// transient
-	//UPROPERTY(Transient) ALivreCharacter* LivreCharacterOwner;
 
 public:
 	/** Returns Mesh1P subobject **/
@@ -170,7 +153,7 @@ public:
 	void EventAnyDamage(float Damage);
 	void EventOnLanded();
 	
-	// collision event
+	// sule collision event
 	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void CapsuleTouched(
 		UPrimitiveComponent* OverlappedComponent,
@@ -180,7 +163,7 @@ public:
 		bool bFromSweep,
 		const FHitResult &SweepResult
 		);
-	// ervents continued
+	// wall events continued
 	void BeginWallRun();
 	void CallEndWallRun();
 	void EndWallRun(WallRunEnd Why);
@@ -222,12 +205,7 @@ private:
 	int jumpLeft;
 	const int maxJump = 2;
 	float axisRight;
+	float axisLeft;
 	float axisForward;
-
-	// UPROPERTY(EditInstanceOnly)
-	// void Landed(const FHitResult& Hit) override;
-	// void EnterSlide(EMovementMode PrevMode, CustomMovementMode PrevCustomMode);
-	// void ExitSlide();
-	// bool CanSlide() const;
-	// void PhysSlide(float deltaTime, int32 Iterations);
+	
 };
