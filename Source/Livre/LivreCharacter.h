@@ -153,7 +153,7 @@ public:
 	void EventAnyDamage(float Damage);
 	void EventOnLanded();
 	
-	// sule collision event
+	// capsule collision event
 	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void CapsuleTouched(
 		UPrimitiveComponent* OverlappedComponent,
@@ -169,7 +169,9 @@ public:
 	void EndWallRun(WallRunEnd Why);
 	
 private:
-
+	//health system
+	bool isDead = false;
+	
 	// vector variables for wall climbing/running
 	FVector wallLocation;
 	FVector wallNormal;
@@ -185,7 +187,7 @@ private:
 	bool canClimb = true;
 	bool isClimbing = false;
 	bool isSprinting = false;
-	bool isDead = false;
+
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
 

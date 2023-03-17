@@ -313,7 +313,7 @@ void ALivreCharacter::CustomVaultingPressed()
 			{
 				wallHeight2 = HitTracking3.Location;
 
-				wallIsThicc = (wallHeight - wallHeight2).Z <= 30.0f;	//  negation was removed for simplicity
+				wallIsThicc = (wallHeight - wallHeight2).Z <= 30.0f;	
 			}
 			else
 			{
@@ -490,7 +490,7 @@ void ALivreCharacter::UpdateWallRun()
     }
 	printf("update wall run");
 }
-
+// It clamps horizontal velocity
 void ALivreCharacter::ClampHorizontalVelocity()
 {
     if (GetCharacterMovement()->IsFalling())
@@ -506,7 +506,7 @@ void ALivreCharacter::ClampHorizontalVelocity()
     }
 	printf("clamp horizontal velocity");
 }
-
+// Double return helper function for wall run side and cross product
 std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputWallNormal)
 {
 	enum WallRunSide SideLocal;
@@ -530,7 +530,7 @@ std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector InputW
 	printf("find run direction and side");
     return std::tuple(CrossProduct, SideLocal);
 }
-
+// Helper function to determine is the 
 bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
 {
     if (surfaceVector.Z < -0.05f)
@@ -548,7 +548,7 @@ bool ALivreCharacter::IsSurfaceWallRan(FVector surfaceVector)
 	printf("is surface wall run");
     return (ArcCosDotResult < WalkableFloorAngle);
 }
-
+// Additional function for slide (legacy atm)
 FVector ALivreCharacter::LaunchVelocity()
 {
     FVector LaunchDirection;
@@ -570,6 +570,7 @@ FVector ALivreCharacter::LaunchVelocity()
     // sequence 1
     return (LaunchDirection + FVector(0, 0, 1)) * GetCharacterMovement()->JumpZVelocity;
 }
+
 // Conditional function to check if there is wall on left or right and start/end wall running
 bool ALivreCharacter::AreKeysRequired()
 {
@@ -606,14 +607,14 @@ bool ALivreCharacter::JumpUsed()
 	printf("jump used");
 	return false;
 }
-// Resets number of jumps availab;e
+// Resets number of jumps availabLe
 void ALivreCharacter::EventJumpReset(int Jumps)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("CALLING EVENTJUMPRESET(). New Jump Value = %i"), Jumps);
 
 	jumpLeft = UKismetMathLibrary::Clamp(Jumps, 0, maxJump);
 }
-// Damage dealt to player, if 0 ends the game
+// Damage dealt to player, if 0 ends the game. Needed for drones
 void ALivreCharacter::EventAnyDamage(float Damage)
 {
 	health -= Damage;
@@ -670,14 +671,15 @@ void ALivreCharacter::CapsuleTouched(
 		}
 	}
 }
-
+// Before and durimg first stage of wall run 
 void ALivreCharacter::BeginWallRun()
 {
 	// sequence 0
 	if (!isWallRunning)	// makes sure the function isn't called multiple times on activation
 	{
 		// check in here to see if the player is next to a wall before deciding to activate the wall run
-		// doesn't check for sides atm
+		
+		// doesn't check for sides atm FIX ASAP
 		FHitResult HitResultCapture;
 		FVector TraceEnd = GetActorLocation() + (GetActorRightVector() * (250 * (WallRunSide == Left ? 1 : -1)));
 		bool LineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
@@ -692,7 +694,7 @@ void ALivreCharacter::BeginWallRun()
 			true
 			);
 
-		// when the check for wall is check and allows to run
+		// when the check for wall is checked and allows to run
 		if (LineTraceDidHit)
 		{
 			FTimerHandle BWR_Delayhandle;
@@ -724,9 +726,9 @@ void ALivreCharacter::CallEndWallRun()
 // Detects why wall run ended (2 reasons why)
 void ALivreCharacter::EndWallRun(WallRunEnd Why)
 {
-	if (isWallRunning) // we only want to stop the wallr unning if it's already started
+	if (isWallRunning) // stops the wall running if it's already started
 	{
-		switch (Why)
+		switch (Why) // why stopped
 		{
 		case FallOff:
 			EventJumpReset(1);
@@ -762,7 +764,7 @@ void ALivreCharacter::Move(const FInputActionValue& Value)
 // Looking using mouse
 void ALivreCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D for the same reasona as above
+	// input is a Vector2D for the same reason as above
 	
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
