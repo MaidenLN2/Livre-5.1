@@ -17,6 +17,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "SimModule/SimulationModuleBase.h"
 #include "InputMappingContext.h"
+#include "Components/TimelineComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -44,7 +45,10 @@ ALivreCharacter::ALivreCharacter()
 	Mesh1P->CastShadow = false;
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
+	
+	//tUpdateWallRun = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline UpdaterWallRun"));
+	//tUpdateWallRun->SetTimelineLength(5.0f);
+	
 	// Connecting Collision Detection Functions
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// might work?
 }
@@ -70,6 +74,8 @@ void ALivreCharacter::BeginPlay()
 	GetCharacterMovement()->SetPlaneConstraintEnabled(false);
 	printf("GetCharacterMovement()->SetPlaneConstraintEnabled(false)");
 
+
+	
 	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // might need to be a BP specific function
 
 }
@@ -673,17 +679,50 @@ void ALivreCharacter::CapsuleTouched(
 
 void ALivreCharacter::BeginWallRun()
 {
+	
+	// FTimerHandle TestHandle;        // Can be declared inside the function and not worried about again
+	//
+	// GetWorld()->GetTimerManager().SetTimer(TestHandle, [&]()
+	// {
+	// 	if (!isUpdatingWallRun)
+	// 	{
+	// 		isUpdatingWallRun = true;
+	// 		GetWorld()->GetTimerManager().SetTimer(TestHandle, [&]()
+	// 		{
+	// 			EndWallRun(FallOff);
+	// 		}, -1.0f, false, timeDelay);
+	// 	}
+	// 	else
+	// 	{
+	// 		UpdateWallRun();
+	// 	}
+	// }, 0.01f, true);
+	
 	// sequence 0
 	if (!isWallRunning)	// This check makes sure the function isn't called multiple times on activation. Once it activates once, it prevents it from starting again.
 	{
 		// Added check in here to see if the player is next to a wall before deciding to activate the wallrun.
 		// Doesn't check for sides atm.
 		FHitResult HitResultCapture;
-		FVector TraceEnd = GetActorLocation() + (GetActorRightVector() * (250 * (WallRunSide == Left ? 1 : -1)));
-		bool LineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
+		
+		FVector rightTraceEnd = GetActorLocation() + (GetActorRightVector() * 250);
+		bool rightLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
 			this,
 			GetActorLocation(),
-			TraceEnd,
+			rightTraceEnd,
+			UEngineTypes::ConvertToTraceType(ECC_Visibility),
+			false,
+			TArray<AActor*>(),
+			EDrawDebugTrace::Persistent,
+			HitResultCapture,
+			true
+			);
+
+		FVector leftTraceEnd = GetActorLocation() + (GetActorRightVector() * -250);
+		bool leftLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
+			this,
+			GetActorLocation(),
+			leftTraceEnd,
 			UEngineTypes::ConvertToTraceType(ECC_Visibility),
 			false,
 			TArray<AActor*>(),
@@ -693,7 +732,7 @@ void ALivreCharacter::BeginWallRun()
 			);
 
 		// If we did detect a line trace, perform the function and let's wallrun!
-		if (LineTraceDidHit)
+		if (rightLineTraceDidHit || leftLineTraceDidHit)
 		{
 			FTimerHandle BWR_Delayhandle;
 			GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
@@ -743,11 +782,12 @@ void ALivreCharacter::EndWallRun(WallRunEnd Why)
 		GetCharacterMovement()->AirControl = 0.05f;
 		GetCharacterMovement()->GravityScale = 1.0f; // why not working?
 		isWallRunning = false;
+		isUpdatingWallRun = false;
 	}
 
 	//  place for camera tilt end
 
-
+	
 }
 
 void ALivreCharacter::Move(const FInputActionValue& Value)
