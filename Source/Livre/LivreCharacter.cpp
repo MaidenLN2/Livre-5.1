@@ -113,7 +113,7 @@ void ALivreCharacter::BeginPlay()
 
  		//Wallrunning
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
- 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Ongoing, this, &ALivreCharacter::UpdateWallRun);
+ 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Triggered, this, &ALivreCharacter::UpdateWallRun);
  		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Completed, this, &ALivreCharacter::CallEndWallRun);
  		// ^Calls EndWallRun early so that the wallrun button has to be held in order for the player to continue wallrunning
  		UE_LOG(LogTemp, Warning, TEXT("wallrun custom"));
@@ -468,7 +468,7 @@ void ALivreCharacter::UpdateWallRun()
             UEngineTypes::ConvertToTraceType(ECC_Visibility),
             false,
             TArray<AActor*>(),
-            EDrawDebugTrace::None,
+            EDrawDebugTrace::Persistent,
             HitResultCapture,
             true
             );
@@ -579,14 +579,15 @@ FVector ALivreCharacter::LaunchVelocity()
 
 bool ALivreCharacter::AreKeysRequired()
 {
-    if (axisForward > 0.1f)
+	
+    if (inputStorage.Y > 0.1f)
     {
         switch (WallRunSide)
         {
         case Left:
-            return axisLeft > 0.1f;
+            return inputStorage.X > 0.1f;
         case Right:
-            return axisRight < 0.1f;
+            return inputStorage.X < -0.1f;
         default: ;
         }
     }
@@ -713,7 +714,7 @@ void ALivreCharacter::BeginWallRun()
 			UEngineTypes::ConvertToTraceType(ECC_Visibility),
 			false,
 			TArray<AActor*>(),
-			EDrawDebugTrace::Persistent,
+			EDrawDebugTrace::None,
 			HitResultCapture,
 			true
 			);
@@ -726,7 +727,7 @@ void ALivreCharacter::BeginWallRun()
 			UEngineTypes::ConvertToTraceType(ECC_Visibility),
 			false,
 			TArray<AActor*>(),
-			EDrawDebugTrace::Persistent,
+			EDrawDebugTrace::None,
 			HitResultCapture,
 			true
 			);
@@ -734,6 +735,15 @@ void ALivreCharacter::BeginWallRun()
 		// If we did detect a line trace, perform the function and let's wallrun!
 		if (rightLineTraceDidHit || leftLineTraceDidHit)
 		{
+			if (rightLineTraceDidHit)
+			{
+				WallRunSide = Right;
+			}
+			else
+			{
+				WallRunSide = Left;
+			}
+			
 			FTimerHandle BWR_Delayhandle;
 			GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
 			{
@@ -753,9 +763,7 @@ void ALivreCharacter::BeginWallRun()
 	}
 }
 
-/**
- * @brief Function explicitly to work within the EnhancedInputComponent as binding functions to actions requires they do not have variables to enter, for now.
- */
+
 void ALivreCharacter::CallEndWallRun()
 {
 	if (isWallRunning)
@@ -794,6 +802,7 @@ void ALivreCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
+	inputStorage = MovementVector;
 
 	if (Controller != nullptr)
 	{
