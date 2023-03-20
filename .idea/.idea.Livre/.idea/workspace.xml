@@ -5,12 +5,7 @@
     <projectFile>Intermediate/ProjectFiles/UE5.vcxproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bbe29a04-36e7-4b1e-99f4-55eae25bfd20" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2A_R4.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2A_R4.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/L3_A.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPerson/Maps/L3_A.umap" afterDir="false" />
-    </list>
+    <list default="true" id="bbe29a04-36e7-4b1e-99f4-55eae25bfd20" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,9 +32,9 @@
   },
   "keyToStringList": {
     "rider.external.source.directories": [
-      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\Blaike Harnett\\AppData\\Local\\Symbols\\src"
+      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\ITLoanPC\\AppData\\Local\\Symbols\\src"
     ]
   }
 }]]></component>
@@ -221,6 +216,7 @@
       <workItem from="1679263725104" duration="1140000" />
       <workItem from="1679265658462" duration="4604000" />
       <workItem from="1679273068515" duration="679000" />
+      <workItem from="1679275481465" duration="163000" />
     </task>
     <servers />
   </component>
