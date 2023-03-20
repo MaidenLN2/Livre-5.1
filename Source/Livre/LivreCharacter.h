@@ -202,10 +202,13 @@ private:
 	// wall running variables
 	FVector wallRunDirection;
 	bool isWallRunning;
+	bool isUpdatingWallRun = false;
+	int timeDelay = 5;
 	int jumpLeft;
 	const int maxJump = 2;
 	float axisRight;
 	float axisLeft;
 	float axisForward;
+	//UTimelineComponent* tUpdateWallRun;
 	
 };
