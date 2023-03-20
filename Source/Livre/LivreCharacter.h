@@ -201,6 +201,8 @@ private:
 
 	// wall running variables
 	FVector wallRunDirection;
+	FVector2D inputStorage;
+	UPROPERTY(BlueprintReadOnly, meta =(AllowPrivateAccess = "true"))
 	bool isWallRunning;
 	bool isUpdatingWallRun = false;
 	int timeDelay = 5;
