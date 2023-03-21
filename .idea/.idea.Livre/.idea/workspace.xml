@@ -11,6 +11,9 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/ucrt/stdio.h" root0="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -217,8 +220,8 @@
       <workItem from="1679265658462" duration="4604000" />
       <workItem from="1679273068515" duration="679000" />
       <workItem from="1679275481465" duration="163000" />
-      <workItem from="1679297511271" duration="1520000" />
-      <workItem from="1679309178008" duration="17000" />
+      <workItem from="1679297511271" duration="6620000" />
+      <workItem from="1679370482704" duration="11004000" />
     </task>
     <servers />
   </component>
