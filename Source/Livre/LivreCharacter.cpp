@@ -48,6 +48,16 @@ ALivreCharacter::ALivreCharacter()
 	
 	//tUpdateWallRun = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline UpdaterWallRun"));
 	//tUpdateWallRun->SetTimelineLength(5.0f);
+
+	WallDetectionCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Wall Detector"));
+	WallDetectionCapsule->SetupAttachment(RootComponent);
+	WallDetectionCapsule->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
+	WallDetectionCapsule->SetCapsuleHalfHeight(200.0f);
+	WallDetectionCapsule->SetCapsuleRadius(10.0f);
+	WallDetectionCapsule->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::WallDetectionBeginOverlap);
+	WallDetectionCapsule->OnComponentEndOverlap.AddDynamic(this, &ALivreCharacter::WallDetectionEndOverlap);
+	WallDetectionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	WallDetectionCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	
 	// Connecting Collision Detection Functions
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// might work?
@@ -98,23 +108,23 @@ void ALivreCharacter::BeginPlay()
  		UE_LOG(LogTemp, Warning, TEXT("moving"));
 
 // 		//Looking
- 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Started, this, &ALivreCharacter::Look);
+ 		EnhancedInputComponent->BindAction(lookAction, ETriggerEvent::Started, this, &ALivreCharacter::Look);
  		UE_LOG(LogTemp, Warning, TEXT("looking"));
 
 		//Sprinting
- 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSprintPressed);
- 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSprintReleased);	// Stops the player from sprinting
+ 		EnhancedInputComponent->BindAction(sprintAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSprintPressed);
+ 		EnhancedInputComponent->BindAction(sprintAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSprintReleased);	// Stops the player from sprinting
  		UE_LOG(LogTemp, Warning, TEXT("sprint custom"));
 
  		//Sliding
- 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
- 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
+ 		EnhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
+ 		EnhancedInputComponent->BindAction(slideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
  		UE_LOG(LogTemp, Warning, TEXT("slide custom"));
 
  		//Wallrunning
- 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
- 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Triggered, this, &ALivreCharacter::UpdateWallRun);
- 		EnhancedInputComponent->BindAction(WallrunAction, ETriggerEvent::Completed, this, &ALivreCharacter::CallEndWallRun);
+ 		EnhancedInputComponent->BindAction(wallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
+ 		EnhancedInputComponent->BindAction(wallrunAction, ETriggerEvent::Triggered, this, &ALivreCharacter::UpdateWallRun);
+ 		EnhancedInputComponent->BindAction(wallrunAction, ETriggerEvent::Completed, this, &ALivreCharacter::CallEndWallRun);
  		// ^Calls EndWallRun early so that the wallrun button has to be held in order for the player to continue wallrunning
  		UE_LOG(LogTemp, Warning, TEXT("wallrun custom"));
 
@@ -433,12 +443,14 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 
 	return parametres;
 }
+
 // Setting running speed
 void ALivreCharacter::StartSprint(float NewSprintSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSprintSpeed;
 	printf("start sprint");
 }
+
 // Changing sprinting speed to walking speed
 void ALivreCharacter::StopSprint(float NewWalkSpeed)
 {
@@ -457,10 +469,10 @@ void ALivreCharacter::StopSprint(float NewWalkSpeed)
 // What is happening during actual wall run (math)
 void ALivreCharacter::UpdateWallRun()
 {
-    if (AreKeysRequired())
+    if (/*WallToRunOn && */isWallRunning)
     {
         FHitResult HitResultCapture;
-        FVector TraceEnd = GetActorLocation() + (GetActorRightVector() * (250 * (WallRunSide == Left ? 1 : -1)));
+        FVector TraceEnd = GetActorLocation() + (GetActorRightVector() * (250 * (WallRunSide != Left ? 1 : -1)));
         bool LineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
             this,
             GetActorLocation(),
@@ -472,15 +484,16 @@ void ALivreCharacter::UpdateWallRun()
             HitResultCapture,
             true
             );
-
+        
         if (LineTraceDidHit)
         {
             auto [Direction, Side] = FindRunDirectionAndSide(HitResultCapture.ImpactNormal);
+ 
 
             if (Side == WallRunSide)
             {
                 wallRunDirection = Direction;
-
+            
                 FVector SpeedByWallRunDirection = wallRunDirection * GetCharacterMovement()->GetMaxSpeed();
                 GetCharacterMovement()->Velocity = FVector(SpeedByWallRunDirection.X, SpeedByWallRunDirection.Y, 0.0f);
             }
@@ -495,6 +508,38 @@ void ALivreCharacter::UpdateWallRun()
         }
     }
 	printf("update wall run");
+
+//   	FVector2D CardinalForward;
+//   	FVector2D PositiveX(1.0f, 0.0f);
+//   	FVector2D NegativeX(-1.0f, 0.0f);
+//   	FVector2D PositiveY(0.0f, 1.0f);
+//   	FVector2D NegativeY(0.0f, -1.0f);
+//   	FVector2D ActorForward(GetActorForwardVector());
+//   	float DotProduct = 999999;
+//
+//       if (float newProduct = FVector2D::DotProduct(ActorForward, PositiveX); newProduct < DotProduct)
+//       {
+//        DotProduct = newProduct;
+//       	CardinalForward = PositiveX;
+//       }
+//       if (float newProduct = FVector2D::DotProduct(ActorForward, NegativeX); newProduct < DotProduct)
+//       {
+//        DotProduct = newProduct;
+//       	CardinalForward = NegativeX;
+//       }
+//       if (float newProduct = FVector2D::DotProduct(ActorForward, PositiveY); newProduct < DotProduct)
+//       {
+//        DotProduct = newProduct;
+//       	CardinalForward = PositiveY;
+//       }
+//       if (float newProduct = FVector2D::DotProduct(ActorForward, NegativeY); newProduct < DotProduct)
+//       {
+//        	CardinalForward = NegativeY;
+// }    
+//   	
+//   	FVector SpeedByWallRunDirection = FVector(-CardinalForward, GetActorForwardVector().Z) * GetCharacterMovement()->GetMaxSpeed();
+//    	// FVector SpeedByWallRunDirection = wallRunDirection * GetCharacterMovement()->GetMaxSpeed();
+//   	GetCharacterMovement()->Velocity = SpeedByWallRunDirection;//FVector(SpeedByWallRunDirection.X, SpeedByWallRunDirection.Y, 0.0f);
 }
 
 void ALivreCharacter::ClampHorizontalVelocity()
@@ -579,20 +624,40 @@ FVector ALivreCharacter::LaunchVelocity()
 
 bool ALivreCharacter::AreKeysRequired()
 {
+	const FVector2D CurrentVelocity(GetCharacterMovement()->Velocity);
+	const FVector2D ActorForwardVector2D(GetActorForwardVector());
+	const FVector2D ActorRightVector2D(GetActorRightVector());
+
+	const float DotForward = FVector2D::DotProduct(CurrentVelocity, ActorForwardVector2D);
+
+	UE_LOG(LogTemp, Warning, TEXT("DotForward = %f"), DotForward);
+
+	if (DotForward > 90)
+	{
+		return true;
+	}
+
+	return false;
 	
-    if (inputStorage.Y > 0.1f)
-    {
-        switch (WallRunSide)
-        {
-        case Left:
-            return inputStorage.X > 0.1f;
-        case Right:
-            return inputStorage.X < -0.1f;
-        default: ;
-        }
-    }
-	printf("are keys required");
-    return false;
+	// UE_LOG(LogTemp, Warning, TEXT("InputStorage: X = %f, Y = %f"), inputStorage.X, inputStorage.Y);
+	//    if (inputStorage.Y > 0.1f && false)
+	//    {
+	//    	//UE_LOG(LogTemp, Warning, TEXT("InputStorage Y Successful"));
+	//    	
+	//        switch (WallRunSide)
+	//        {
+	//        case Left:
+	//        	//UE_LOG(LogTemp, Warning, TEXT("InputStorage Left Successful"));
+	//        	//UE_LOG(LogTemp, Warning, TEXT("Left Output: %hhd"), inputStorage.X < -0.1f);
+	//            return inputStorage.X < -0.1f;
+	//        case Right:
+	//        	//UE_LOG(LogTemp, Warning, TEXT("InputStorage Right Successful"));
+	//        	//UE_LOG(LogTemp, Warning, TEXT("Right Output: %hhd"), inputStorage.X > 0.1f);
+	//            return inputStorage.X > 0.1f;
+	//        default: ;
+	//        }
+	//    }
+	// return true;
 }
 
 FVector2d ALivreCharacter::GetHorizontalVelocity()
@@ -698,68 +763,86 @@ void ALivreCharacter::BeginWallRun()
 	// 		UpdateWallRun();
 	// 	}
 	// }, 0.01f, true);
-	
-	// sequence 0
-	if (!isWallRunning)	// This check makes sure the function isn't called multiple times on activation. Once it activates once, it prevents it from starting again.
+
+	/// LERA IMPLEMENTATION
+	// // sequence 0
+	// if (!isWallRunning)	// This check makes sure the function isn't called multiple times on activation. Once it activates once, it prevents it from starting again.
+	// {
+	// 	// Added check in here to see if the player is next to a wall before deciding to activate the wallrun.
+	// 	// Doesn't check for sides atm.
+	// 	FHitResult HitResultCapture;
+	// 	
+	// 	FVector rightTraceEnd = GetActorLocation() + (GetActorRightVector() * 250);
+	// 	bool rightLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
+	// 		this,
+	// 		GetActorLocation(),
+	// 		rightTraceEnd,
+	// 		UEngineTypes::ConvertToTraceType(ECC_Visibility),
+	// 		false,
+	// 		TArray<AActor*>(),
+	// 		EDrawDebugTrace::None,
+	// 		HitResultCapture,
+	// 		true
+	// 		);
+	//
+	// 	FVector leftTraceEnd = GetActorLocation() + (GetActorRightVector() * -250);
+	// 	bool leftLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
+	// 		this,
+	// 		GetActorLocation(),
+	// 		leftTraceEnd,
+	// 		UEngineTypes::ConvertToTraceType(ECC_Visibility),
+	// 		false,
+	// 		TArray<AActor*>(),
+	// 		EDrawDebugTrace::None,
+	// 		HitResultCapture,
+	// 		true
+	// 		);
+	//
+	// 	// If we did detect a line trace, perform the function and let's wallrun!
+	// 	if (rightLineTraceDidHit || leftLineTraceDidHit)
+	// 	{
+	// 		if (rightLineTraceDidHit)
+	// 		{
+	// 			WallRunSide = Right;
+	// 		}
+	// 		else
+	// 		{
+	// 			WallRunSide = Left;
+	// 		}
+	// 		
+	// 		FTimerHandle BWR_Delayhandle;
+	// 		GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
+	// 		{
+	// 			// call End Wall Run
+	// 			EndWallRun(FallOff);
+	// 		}, 2, false);
+	//
+	// 		// sequence 1 where player runs on walls
+	// 		GetCharacterMovement()->AirControl = 1.0f;
+	// 		GetCharacterMovement()->GravityScale = 0.0f;
+	//
+	// 		isWallRunning = true;
+	// 		//  place for camera tilt begin
+	//
+	// 		// Timeline the UpdateWallRun function for 5 seconds
+	// 	}
+	// }
+
+	/// capsule implementation of wall running
+	if (!isWallRunning && WallToRunOn)
 	{
-		// Added check in here to see if the player is next to a wall before deciding to activate the wallrun.
-		// Doesn't check for sides atm.
-		FHitResult HitResultCapture;
-		
-		FVector rightTraceEnd = GetActorLocation() + (GetActorRightVector() * 250);
-		bool rightLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
-			this,
-			GetActorLocation(),
-			rightTraceEnd,
-			UEngineTypes::ConvertToTraceType(ECC_Visibility),
-			false,
-			TArray<AActor*>(),
-			EDrawDebugTrace::None,
-			HitResultCapture,
-			true
-			);
-
-		FVector leftTraceEnd = GetActorLocation() + (GetActorRightVector() * -250);
-		bool leftLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
-			this,
-			GetActorLocation(),
-			leftTraceEnd,
-			UEngineTypes::ConvertToTraceType(ECC_Visibility),
-			false,
-			TArray<AActor*>(),
-			EDrawDebugTrace::None,
-			HitResultCapture,
-			true
-			);
-
-		// If we did detect a line trace, perform the function and let's wallrun!
-		if (rightLineTraceDidHit || leftLineTraceDidHit)
+		FTimerHandle BWR_Delayhandle;
+		GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
 		{
-			if (rightLineTraceDidHit)
-			{
-				WallRunSide = Right;
-			}
-			else
-			{
-				WallRunSide = Left;
-			}
-			
-			FTimerHandle BWR_Delayhandle;
-			GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
-			{
-				// call End Wall Run
-				EndWallRun(FallOff);
-			}, 2, false);
-	
-			// sequence 1 where player runs on walls
-			GetCharacterMovement()->AirControl = 1.0f;
-			GetCharacterMovement()->GravityScale = 0.0f;
+			// call End Wall Run
+			EndWallRun(FallOff);
+		}, 2, false);
 
-			isWallRunning = true;
-			//  place for camera tilt begin
+		// sequence 1 where player runs on walls
+		GetCharacterMovement()->AirControl = 1.0f;
+		GetCharacterMovement()->GravityScale = 0.0f;
 
-			// Timeline the UpdateWallRun function for 5 seconds
-		}
+		isWallRunning = true;
 	}
 }
 
@@ -796,6 +879,33 @@ void ALivreCharacter::EndWallRun(WallRunEnd Why)
 	//  place for camera tilt end
 
 	
+}
+
+void ALivreCharacter::WallDetectionBeginOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	if (!WallToRunOn && OtherComp->GetClass() == UStaticMeshComponent::StaticClass())
+	{
+		WallToRunOn = Cast<UStaticMeshComponent>(OtherComp);
+	}
+}
+
+void ALivreCharacter::WallDetectionEndOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	if (WallToRunOn && OtherComp == WallToRunOn)
+	{
+		WallToRunOn = nullptr;
+		EndWallRun(FallOff);
+	}
 }
 
 void ALivreCharacter::Move(const FInputActionValue& Value)

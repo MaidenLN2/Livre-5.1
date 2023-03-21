@@ -47,6 +47,12 @@ class ALivreCharacter : public ACharacter
 public:
 	ALivreCharacter();
 
+	// floats
+	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
+	float walkSpeed = 1000.0f;
+	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
+	float sprintSpeed = 5000.0f;
+
 protected:
 	virtual void BeginPlay();
 
@@ -54,16 +60,16 @@ public:
 		
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	class UInputAction* lookAction;
 	/** Sprint Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SprintAction;
+	class UInputAction* sprintAction;
 	/** Slide Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SlideAction;
+	class UInputAction* slideAction;
 	/** Wallrun Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* WallrunAction;
+	class UInputAction* wallrunAction;
 	
 	UPROPERTY(BlueprintReadWrite)
 	float sensitivity = 1.0f;
@@ -169,6 +175,28 @@ public:
 	void EndWallRun(WallRunEnd Why);
 	
 private:
+	// Jake Functionality
+	UStaticMeshComponent* WallToRunOn;
+	UPROPERTY(EditInstanceOnly)
+	UCapsuleComponent* WallDetectionCapsule;
+
+	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
+	void WallDetectionBeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult &SweepResult
+	);
+	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
+	void WallDetectionEndOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex
+	);
+	
 	//health system
 	bool isDead = false;
 	
@@ -192,8 +220,7 @@ private:
 	bool orientRotationToMovement = false;
 
 	// floats for wall climbing/running
-	float walkSpeed;
-	float sprintSpeed;
+
 	float health;
 	float initialGravity;
 	float fallingGravity;
