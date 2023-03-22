@@ -125,8 +125,8 @@ public:
 	FCollisionQueryParams GetIgnoreCharacterParams();
 	
 	//general functions
-	void StartSprint(float newSprintSpeed = 5000.0f);
-	void StopSprint(float newWalkSpeed = 3000.0f);
+	void StartSprint(float newSprintSpeed = 1750.0f);
+	void StopSprint(float newWalkSpeed = 1000.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
 	void ClampHorizontalVelocity();	// expose to blueprints as this character doesn't have tick for some reason
