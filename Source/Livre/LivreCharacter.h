@@ -81,9 +81,9 @@ public:
 
 	// movement floats for accessibility in editor
 	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
-	float walkSpeed = 1000.0f;
+	float walkSpeed = 5000.0f;
 	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
-	float sprintSpeed = 5000.0f;
+	float sprintSpeed = 10000.0f;
 	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -125,8 +125,8 @@ public:
 	FCollisionQueryParams GetIgnoreCharacterParams();
 	
 	//general functions
-	void StartSprint(float newSprintSpeed = 1000.0f);
-	void StopSprint(float newWalkSpeed = 600.0f);
+	void StartSprint(float newSprintSpeed = 1750.0f);
+	void StopSprint(float newWalkSpeed = 1000.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
 	void ClampHorizontalVelocity();	// expose to blueprints as this character doesn't have tick for some reason

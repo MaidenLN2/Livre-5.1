@@ -210,7 +210,7 @@ void ALivreCharacter::CustomSlidePressed()
 		
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	LaunchCharacter(GetActorForwardVector() * 2000.0f, true, false);
+	LaunchCharacter(GetActorForwardVector() * 2500.0f, true, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
 }
