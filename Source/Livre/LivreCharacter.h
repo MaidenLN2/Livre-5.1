@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <tuple>
 #include "InputActionValue.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "LivreCharacter.generated.h"
 
 class UInputComponent;
@@ -33,7 +34,6 @@ class ALivreCharacter : public ACharacter
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
-		
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -43,21 +43,48 @@ class ALivreCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
+protected:
+	
+	virtual void BeginPlay();
+	
+	/** Called for movement input */
+	void Move(const FInputActionValue& value);
+
+	/** Called for looking/moving input */
+	void Look(const FInputActionValue& value);
+	void MoveForward(float value);
+	void MoveLateral(float value);
+	void LookHorizontal(float value);
+	void LookVertical(float value);
+
+	// APawn interface
+	virtual void SetupPlayerInputComponent(UInputComponent* inputComponent) override;
+	// End of APawn interface
+
+	// Enums
+	enum WallRunSide
+	{
+		Left = 0,
+		Right
+	};
+	
+	WallRunSide wallRunSide;
+
+	enum WallRunEnd
+	{
+		FallOff = 0,
+		JumpOff
+	};
 	
 public:
 	ALivreCharacter();
 
-	// floats
+	// movement floats for accessibility in editor
 	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
 	float walkSpeed = 1000.0f;
 	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
 	float sprintSpeed = 5000.0f;
-
-protected:
-	virtual void BeginPlay();
-
-public:
-		
+	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* lookAction;
@@ -74,51 +101,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float sensitivity = 1.0f;
 
-	/** Bool for AnimBP to switch to another animation set 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	bool bHasRifle;*/
-
-	/** Setter to set the bool 
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void SetHasRifle(bool bNewHasRifle);*/
-
-	/** Getter for the bool 
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool GetHasRifle();*/
-
-protected:
-	/** Called for movement input */
-	void Move(const FInputActionValue& Value);
-
-	/** Called for looking/moving input */
-	void Look(const FInputActionValue& Value);
-	void MoveForward(float value);
-	void MoveLateral(float value);
-	void LookHorizontal(float value);
-	void LookVertical(float value);
-
-protected:
-	// APawn interface
-	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	// End of APawn interface
-
-	// Enums
-	enum WallRunSide
-	{
-		Left = 0,
-		Right
-	};
-	
-	WallRunSide WallRunSide;
-
-	enum WallRunEnd
-	{
-		FallOff = 0,
-		JumpOff
-	};
-
-
-public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
@@ -133,32 +115,36 @@ public:
 	void CustomSlideReleased();
 	void CustomVaultingPressed();
 	void CustomVaultingReleased();
-
+	
+	// wall events
+	void BeginWallRun();
+	void CallEndWallRun();
+	void EndWallRun(WallRunEnd why);
+	
 	//profile collision function
 	FCollisionQueryParams GetIgnoreCharacterParams();
 	
 	//general functions
-	void StartSprint(float NewSprintSpeed = 1000.0f);
-	void StopSprint(float NewWalkSpeed = 600.0f);
+	void StartSprint(float newSprintSpeed = 1000.0f);
+	void StopSprint(float newWalkSpeed = 600.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
 	void ClampHorizontalVelocity();	// expose to blueprints as this character doesn't have tick for some reason
 	
-	// pure functions
-	std::tuple<FVector, int> FindRunDirectionAndSide(FVector InputWallNormal);
+	// pure functions/helper functions
+	std::tuple<FVector, int> FindRunDirectionAndSide(FVector inputWallNormal);
 	bool IsSurfaceWallRan(FVector surfaceVector);
 	FVector LaunchVelocity();
 	bool AreKeysRequired();
 	FVector2d GetHorizontalVelocity();
-
+	void EventJumpReset(int jumps);
+	void EventAnyDamage(float damage);
+	void EventOnLanded();
+	bool LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType, FHitResult& hitResult);
+	
 	// macros
 	bool JumpUsed();
 
-	// events functions
-	void EventJumpReset(int Jumps);
-	void EventAnyDamage(float Damage);
-	void EventOnLanded();
-	
 	// capsule collision event
 	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void CapsuleTouched(
@@ -169,16 +155,14 @@ public:
 		bool bFromSweep,
 		const FHitResult &SweepResult
 		);
-	// wall events continued
-	void BeginWallRun();
-	void CallEndWallRun();
-	void EndWallRun(WallRunEnd Why);
+
 	
 private:
-	// Jake Functionality
-	UStaticMeshComponent* WallToRunOn;
+	
+	// capsule functionality
+	UStaticMeshComponent* wallToRunOn;
 	UPROPERTY(EditInstanceOnly)
-	UCapsuleComponent* WallDetectionCapsule;
+	UCapsuleComponent* wallDetectionCapsule;
 
 	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void WallDetectionBeginOverlap(
@@ -189,6 +173,7 @@ private:
 		bool bFromSweep,
 		const FHitResult &SweepResult
 	);
+	
 	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
 	void WallDetectionEndOverlap(
 		UPrimitiveComponent* OverlappedComponent,
@@ -211,7 +196,7 @@ private:
 
 	// bools for wall climbing/running
 	bool aboutToClimb = false;
-	bool wallIsThicc = false;
+	bool wallIsThick = false;
 	bool canClimb = true;
 	bool isClimbing = false;
 	bool isSprinting = false;
@@ -236,7 +221,5 @@ private:
 	int jumpLeft;
 	const int maxJump = 2;
 	float axisRight;
-	float axisForward;
-	//UTimelineComponent* tUpdateWallRun;
-	
+	float axisForward;	
 };
