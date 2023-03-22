@@ -430,7 +430,7 @@ void ALivreCharacter::UpdateWallRun()
     		cardinalForward = negativeY;
     	}    
   	
-    	FVector speedByWallRunDirection = FVector(-cardinalForward, GetActorForwardVector().Z) * GetCharacterMovement()->GetMaxSpeed();
+    	FVector speedByWallRunDirection = FVector(-cardinalForward, GetFirstPersonCameraComponent()->GetForwardVector().Z) * GetCharacterMovement()->GetMaxSpeed();
     	GetCharacterMovement()->Velocity = speedByWallRunDirection;
     }
 	printf("update wall run");
