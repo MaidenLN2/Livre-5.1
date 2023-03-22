@@ -6,14 +6,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bbe29a04-36e7-4b1e-99f4-55eae25bfd20" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L0_C.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L0_C.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/ucrt/stdio.h" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -36,9 +37,9 @@
   },
   "keyToStringList": {
     "rider.external.source.directories": [
-      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\Blaike Harnett\\AppData\\Local\\Symbols\\src"
+      "C:\\Users\\caleb\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\caleb\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\caleb\\AppData\\Local\\Symbols\\src"
     ]
   }
 }]]></component>
@@ -224,8 +225,15 @@
       <workItem from="1679297511271" duration="6620000" />
       <workItem from="1679370482704" duration="11004000" />
       <workItem from="1679400395130" duration="611000" />
-      <workItem from="1679440580893" duration="7328000" />
-      <workItem from="1679452133241" duration="1018000" />
+      <workItem from="1679440580893" duration="7430000" />
+      <workItem from="1679449076841" duration="2987000" />
+      <workItem from="1679479790848" duration="1034000" />
+      <workItem from="1679480868091" duration="234000" />
+<<<<<<< Updated upstream
+      <workItem from="1679481151716" duration="1337000" />
+=======
+      <workItem from="1679481178326" duration="644000" />
+>>>>>>> Stashed changes
     </task>
     <servers />
   </component>
