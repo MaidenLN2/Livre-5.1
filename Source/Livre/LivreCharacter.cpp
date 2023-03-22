@@ -22,7 +22,7 @@
 LivreCharacter: Luiz Guilherme Ferreira Costa
 
 Age: 17
-Height: full capsule 
+Height: full capsule component
 Family: parents, grandmother and 6 older siblings 
 Occupation: wall cleaner/agent of Espíritos de Liberdade
 Hobbies: parkour, graffiti, dancing
@@ -238,17 +238,7 @@ void ALivreCharacter::CustomVaultingPressed()
 	FVector endPos = startPos + (GetActorForwardVector() * 70.0f); 
 	FHitResult hitTracking;
 	// look more in here
-	bool firstLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
-		this,
-		startPos, //get camera position
-		endPos,
-		TArray<TEnumAsByte<EObjectTypeQuery>>(),
-		true,
-		TArray<AActor*>(),
-		EDrawDebugTrace::ForDuration,
-		hitTracking,
-		true
-		);
+	bool firstLineTraceDidHit = LineTrace(startPos, endPos, EDrawDebugTrace::ForDuration, hitTracking);
 
 	if (firstLineTraceDidHit)
 	{
@@ -262,49 +252,29 @@ void ALivreCharacter::CustomVaultingPressed()
 		FVector startPos2 = endPos2 - FVector(0.0f, 0.0f, 200.0f);
 		FHitResult hitTracking2;
 		
-		bool secondLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
-			this,
-			startPos2,
-			endPos2,
-			TArray<TEnumAsByte<EObjectTypeQuery>>(),
-			true,
-			TArray<AActor*>(),
-			EDrawDebugTrace::ForDuration,
-			hitTracking2,
-			true
-			);
+		bool secondLineTraceDidHit = LineTrace(startPos2, endPos2, EDrawDebugTrace::ForDuration, hitTracking2);
 
 		if (secondLineTraceDidHit)
 		{
 			wallHeight = hitTracking2.Location;
-			// sequence 0
-			aboutToClimb = ((wallHeight - wallLocation).Z > 60.0f);
+				// sequence 0
+				aboutToClimb = ((wallHeight - wallLocation).Z > 60.0f);
 
-			// sequence 1
-			FVector startPos3 = (
-				wallLocation +
-				(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * -50.0f) +
-				FVector(0.0f, 0.0f, 250.0f)
-				);
-			FVector endPos3 = startPos3 - FVector(0.0f, 0.0f, 300.0f);
-			FHitResult hitTracking3;
+				// sequence 1
+				FVector startPos3 = (
+					wallLocation +
+					(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * -50.0f) +
+					FVector(0.0f, 0.0f, 250.0f)
+					);
+			
+				FVector endPos3 = startPos3 - FVector(0.0f, 0.0f, 300.0f);
+				FHitResult hitTracking3;
 
-			bool thirdLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
-				this,
-				startPos3,
-				endPos3,
-				TArray<TEnumAsByte<EObjectTypeQuery>>(),
-				true,
-				TArray<AActor*>(),
-				EDrawDebugTrace::ForDuration,
-				hitTracking3,
-				true
-				);
+			bool thirdLineTraceDidHit = LineTrace(startPos3, endPos3, EDrawDebugTrace::ForDuration, hitTracking3);
 
 			if (thirdLineTraceDidHit)
 			{
 				wallHeight2 = hitTracking3.Location;
-
 				wallIsThick = (wallHeight - wallHeight2).Z <= 30.0f;	//  negation was removed for simplicity
 			}
 			else
@@ -315,60 +285,41 @@ void ALivreCharacter::CustomVaultingPressed()
 			if (aboutToClimb)
 			{
 				// sequence 0
-				FVector startPos4 = GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);
-				
-				bool fourthLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
-					this,
-					startPos4,
-					startPos4 + GetActorForwardVector() * 70.0f,
-					TArray<TEnumAsByte<EObjectTypeQuery>>(),
-					true,
-					TArray<AActor*>(),
-					EDrawDebugTrace::ForDuration,
-					hitTracking3,
-					true
-					);
+				FVector startPos4 = GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);		
+				bool fourthLineTraceDidHit = LineTrace(startPos4, startPos4 + GetActorForwardVector() * 70.0f, EDrawDebugTrace::ForDuration, hitTracking3);
 
 				if (fourthLineTraceDidHit) canClimb = false;
 				
-				// this last trace may not be necessary, none of the outputs are used.
-				bool FifthLineTraceDidHit = UKismetSystemLibrary::LineTraceSingleForObjects(
-					this,
-					GetActorLocation(),
-					GetActorLocation() + FVector(0.0f, 0.0f, 200.0f),
-					TArray<TEnumAsByte<EObjectTypeQuery>>(),
-					true,
-					TArray<AActor*>(),
-					EDrawDebugTrace::ForDuration,
-					hitTracking3,
-					true
-					);
+				// this last trace might be unnecessary, none of the outputs are used.
+				bool FifthLineTraceDidHit = LineTrace(GetActorLocation(), GetActorLocation() + FVector(0.0f, 0.0f, 200.0f), EDrawDebugTrace::ForDuration, hitTracking3);
 
-				// sequence 1
-				if (canClimb)
-				{
-					GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-					SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
-					
-					SetActorLocation(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * 50.0f + GetActorLocation());
-					SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 44.0f));
-					
-					// play anim montage here
-					// Duration = PlayAnimMontage();
-					float duration = 4.0f;
-
-					UKismetSystemLibrary::PrintString(this, "landing happened after animation");
-
-					FTimerHandle CVP_ClimbTimerHandle;
-					GetWorld()->GetTimerManager().SetTimer(CVP_ClimbTimerHandle, [&]()
+					// sequence 1
+					if (canClimb)
 					{
-						GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-						GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-					}, duration, false);
-				}
+						GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+						GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+						SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
+						
+						SetActorLocation(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * 50.0f + GetActorLocation());
+						SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 44.0f));
+					
+							// play anim montage here
+							// duration = PlayAnimMontage();
+							float duration = 4.0f;
+
+							UKismetSystemLibrary::PrintString(this, "landing happened after animation");
+
+							FTimerHandle CVP_ClimbTimerHandle;
+							GetWorld()->GetTimerManager().SetTimer(CVP_ClimbTimerHandle, [&]()
+							{
+								GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+								GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+							}, duration, false);
+					}
 			}
+			
 			else
+				
 			{
 				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -378,27 +329,31 @@ void ALivreCharacter::CustomVaultingPressed()
 
 				float duration;
 				if (wallIsThick)
-				{
-					// getting Up Animation goes here
-					// Duration = PlayAnimMontage();
-					duration = 4.0f;
-				}
+					{
+						// getting Up Animation goes here
+						// duration = PlayAnimMontage();
+						duration = 4.0f;
+					}
+				
 				else
-				{
-					SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 20.0f));
 					
-					// Duration = PlayAnimMontage();
-					duration = 3.0f;
-					UKismetSystemLibrary::PrintString(this, "vaulting happened after animation");
-				}
+					{
+						SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 20.0f));
+						
+						// duration = PlayAnimMontage();
+						duration = 3.0f;
+						UKismetSystemLibrary::PrintString(this, "vaulting happened after animation");
+					}
+				
+						FTimerHandle cvpTimerHandle;
+						GetWorld()->GetTimerManager().SetTimer(cvpTimerHandle, [&]()
+						{
+							GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+							GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+							SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
+						}, duration, false);
 
-				FTimerHandle cvpTimerHandle;
-				GetWorld()->GetTimerManager().SetTimer(cvpTimerHandle, [&]()
-				{
-					GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-					GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-					SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
-				}, duration, false);
+				
 			}
 		}
 	}
@@ -426,14 +381,12 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 void ALivreCharacter::StartSprint(float newSprintSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = newSprintSpeed;
-	printf("start sprint");
 }
 
 // Changing sprinting speed to walking speed
 void ALivreCharacter::StopSprint(float newWalkSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = newWalkSpeed;
-	printf("stop sprint");
 }
 
 // Setting movement velocity
@@ -477,8 +430,8 @@ void ALivreCharacter::UpdateWallRun()
     		cardinalForward = negativeY;
     	}    
   	
-    	FVector SpeedByWallRunDirection = FVector(-cardinalForward, GetActorForwardVector().Z) * GetCharacterMovement()->GetMaxSpeed();
-    	GetCharacterMovement()->Velocity = SpeedByWallRunDirection;
+    	FVector speedByWallRunDirection = FVector(-cardinalForward, GetFirstPersonCameraComponent()->GetForwardVector().Z) * GetCharacterMovement()->GetMaxSpeed();
+    	GetCharacterMovement()->Velocity = speedByWallRunDirection;
     }
 	printf("update wall run");
 
@@ -498,7 +451,6 @@ void ALivreCharacter::ClampHorizontalVelocity()
             SetHorizontalVelocity(clampedHorizontalVelocity.X, clampedHorizontalVelocity.Y);
         }
     }
-	printf("clamp horizontal velocity");
 }
 
 std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector inputWallNormal)
@@ -508,19 +460,22 @@ std::tuple<FVector, int> ALivreCharacter::FindRunDirectionAndSide(FVector inputW
     FVector2d vectorRight(GetActorRightVector());
 
     float dotProd = FVector2d::DotProduct(vectorFirstNormal, vectorRight);
-
     float zFlip = 1;
+	
     if  (dotProd > 0)
     {
         sideLocal = Right;
     }
+	
     else
+    	
     {
         sideLocal = Left;
         zFlip *= -1;
     }
 
     FVector crossProduct = FVector::CrossProduct(inputWallNormal, FVector(0, 0, zFlip));
+	
     return std::tuple(crossProduct, sideLocal);
 }
 
@@ -579,26 +534,6 @@ bool ALivreCharacter::AreKeysRequired()
 	}
 
 	return false;
-	
-	// UE_LOG(LogTemp, Warning, TEXT("InputStorage: X = %f, Y = %f"), inputStorage.X, inputStorage.Y);
-	//    if (inputStorage.Y > 0.1f && false)
-	//    {
-	//    	//UE_LOG(LogTemp, Warning, TEXT("InputStorage Y Successful"));
-	//    	
-	//        switch (WallRunSide)
-	//        {
-	//        case Left:
-	//        	//UE_LOG(LogTemp, Warning, TEXT("InputStorage Left Successful"));
-	//        	//UE_LOG(LogTemp, Warning, TEXT("Left Output: %hhd"), inputStorage.X < -0.1f);
-	//            return inputStorage.X < -0.1f;
-	//        case Right:
-	//        	//UE_LOG(LogTemp, Warning, TEXT("InputStorage Right Successful"));
-	//        	//UE_LOG(LogTemp, Warning, TEXT("Right Output: %hhd"), inputStorage.X > 0.1f);
-	//            return inputStorage.X > 0.1f;
-	//        default: ;
-	//        }
-	//    }
-	// return true;
 }
 
 FVector2d ALivreCharacter::GetHorizontalVelocity()
@@ -621,8 +556,6 @@ bool ALivreCharacter::JumpUsed()
 
 void ALivreCharacter::EventJumpReset(int jumps)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("CALLING EVENTJUMPRESET(). New Jump Value = %i"), Jumps);
-
 	jumpLeft = UKismetMathLibrary::Clamp(jumps, 0, maxJump);
 }
 // damage system
