@@ -125,6 +125,11 @@ public:
 	//profile collision function
 	FCollisionQueryParams GetIgnoreCharacterParams();
 	
+	// timer variables
+	int time = 180;
+	FTimerHandle timeLimit;
+	FName currentLevel;
+	
 	//general functions
 	void StartSprint(float newSprintSpeed = 1750.0f);
 	void StopSprint(float newWalkSpeed = 1000.0f);
@@ -216,7 +221,7 @@ private:
 
 	// wall running variables
 	FVector wallRunDirection;
-	//FVector2D inputStorage;
+	FVector2D inputStorage;
 	UPROPERTY(BlueprintReadOnly, meta =(AllowPrivateAccess = "true"))
 	bool isWallRunning;
 	bool isUpdatingWallRun = false;
