@@ -215,6 +215,11 @@ private:
 
 	// wall running variables
 	FVector wallRunDirection;
+<<<<<<< Updated upstream
+=======
+	//FVector2D inputStorage;
+	UPROPERTY(BlueprintReadOnly, meta =(AllowPrivateAccess = "true"))
+>>>>>>> Stashed changes
 	bool isWallRunning;
 	bool isUpdatingWallRun = false;
 	int timeDelay = 5;

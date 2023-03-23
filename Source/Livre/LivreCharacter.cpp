@@ -801,7 +801,7 @@ void ALivreCharacter::Move(const FInputActionValue& value)
 {
 	// input is a Vector2D
 	FVector2D movementVector = value.Get<FVector2D>();
-	inputStorage = movementVector;
+	//inputStorage = movementVector;
 
 	if (Controller != nullptr)
 	{
