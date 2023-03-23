@@ -6,8 +6,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay-Regular.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay-Regular_Font.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/TitleText.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2A_R6.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2A_R6.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/MainMenu.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/MainMenu.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -229,6 +233,7 @@
       <workItem from="1679531130937" duration="346000" />
       <workItem from="1679533278127" duration="622000" />
       <workItem from="1679540677752" duration="1213000" />
+      <workItem from="1679566024850" duration="938000" />
     </task>
     <servers />
   </component>
