@@ -6,12 +6,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay-Regular.uasset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay-Regular_Font.uasset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/UI/TitleText.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/DefaultText_MAT_3.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/Holo_MenuButtons3.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/Holo_MenuText.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/Holo_TitleText.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/Holo_TitleText2.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/Holo_TitleText3.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/LM_C.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/MainMenuLevel.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/MainMenuSedgewick.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/SedgwickFont_MAT.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryText.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryText.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/UI/L2A_R6.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2A_R6.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/UI/MainMenu.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/MainMenu.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/MenuText.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/MenuText.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/NewWorld.umap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay-Regular_Font.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay-Regular_Font.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/TitleText.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/TitleText.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/_GENERATED/BlaikeHarnett/Box_9C925B03.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/_GENERATED/BlaikeHarnett/Box_9C925B03.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -234,6 +246,7 @@
       <workItem from="1679533278127" duration="622000" />
       <workItem from="1679540677752" duration="1213000" />
       <workItem from="1679566024850" duration="938000" />
+      <workItem from="1679567582332" duration="613000" />
     </task>
     <servers />
   </component>
