@@ -10,6 +10,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "LivreCharacter.generated.h"
 
+// default classes
 class UInputComponent;
 class USkeletalMeshComponent;
 class USceneComponent;
