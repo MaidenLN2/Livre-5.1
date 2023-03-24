@@ -5,18 +5,14 @@
     <projectFile>Intermediate/ProjectFiles/UE5.vcxproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/LM_C.umap" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/UI/MainMenu_Audio.uasset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/UI/MainMenu_GameMode.uasset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/UI/MainMenu_Widget.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
-    </list>
+    <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/ucrt/stdio.h" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -39,9 +35,9 @@
   },
   &quot;keyToStringList&quot;: {
     &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\Blaike Harnett\\AppData\\Local\\Symbols\\src&quot;
+      &quot;C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\ITLoanPC\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
 }</component>
@@ -235,10 +231,7 @@
       <workItem from="1679606862996" duration="170000" />
       <workItem from="1679609408534" duration="70000" />
       <workItem from="1679609509799" duration="308000" />
-      <workItem from="1679617922300" duration="595000" />
-      <workItem from="1679618932553" duration="626000" />
-      <workItem from="1679620290035" duration="616000" />
-      <workItem from="1679621540076" duration="278000" />
+      <workItem from="1679616035968" duration="4300000" />
     </task>
     <servers />
   </component>
