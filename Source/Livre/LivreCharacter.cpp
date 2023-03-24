@@ -91,22 +91,22 @@ void ALivreCharacter::BeginPlay()
 	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // might need to be a BP specific function
 	
 	//timer functionality
-	currentLevel = *(GetWorld()->GetName());
-	
-	GetWorld()->GetTimerManager().SetTimer(timeLimit, [&]()
-{
-	if (time > 0)
-	{
-		time--;
-		UE_LOG(LogTemp, Warning, TEXT("Time = %i"), time);
-	}
-	else if (time <= 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
-		GetWorldTimerManager().ClearTimer(timeLimit);
-		UGameplayStatics::OpenLevel(this, currentLevel, false);
-	}
-}, 1.0, true);
+// 	currentLevel = *(GetWorld()->GetName());
+// 	
+// 	GetWorld()->GetTimerManager().SetTimer(timeLimit, [&]()
+// {
+// 	if (time > 0)
+// 	{
+// 		time--;
+// 		UE_LOG(LogTemp, Warning, TEXT("Time = %i"), time);
+// 	}
+// 	else if (time <= 0)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
+// 		GetWorld()->GetTimerManager().ClearTimer(timeLimit);
+// 		UGameplayStatics::OpenLevel(this, currentLevel, false);
+// 	}
+// }, 1.0, true);
 
 }
 
