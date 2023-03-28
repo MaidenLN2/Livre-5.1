@@ -6,17 +6,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text0_BP.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text1_BP.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text2_BP.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text3_BP.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text4_BP.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/_GENERATED/caleb/Untitled.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/_GENERATED/caleb/Untitled.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/_GENERATED/ytrj.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/_GENERATED/ytrj.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/Blaike_Test.umap" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/Blaike_Test_02.umap" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/Blaike_Test_03.umap" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/Blaike_Test_04.umap" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/Calebs_Level_Layout.umap" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Maps/Xiang_Test.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPerson/Maps/Xiang_Test.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_B.umap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/LM_Pre.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/LM_Pre.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/MainMenu_WIDG.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/MainMenu_WIDG.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,6 +245,7 @@
       <workItem from="1679964840878" duration="620000" />
       <workItem from="1679967764420" duration="615000" />
       <workItem from="1680032058706" duration="636000" />
+      <workItem from="1680034320847" duration="2681000" />
     </task>
     <servers />
   </component>
