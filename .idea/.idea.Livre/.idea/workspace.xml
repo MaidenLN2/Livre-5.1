@@ -6,11 +6,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Content/UI/PauseMenu_WIDG.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L3_A.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L3_A.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/LM_Pre.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/KillBox_BP.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/PreMainMenu.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/PreMainMenu_WIDG.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_C.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2A_R5.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2A_R5.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2C_R1.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2C_R1.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/LM_C.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/LM_C.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Props/Crates/CratesBox_SM.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Props/Crates/CratesBox_SM.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Props/Crates/CratesCube_SM.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Props/Crates/CratesCube_SM.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -238,6 +245,7 @@
       <workItem from="1679718372757" duration="51000" />
       <workItem from="1679718451931" duration="393000" />
       <workItem from="1679964840878" duration="620000" />
+      <workItem from="1679967764420" duration="615000" />
     </task>
     <servers />
   </component>
