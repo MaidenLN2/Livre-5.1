@@ -81,9 +81,9 @@ public:
 	ALivreCharacter();
 
 	// movement floats for accessibility in editor
-	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
+	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
 	float walkSpeed = 5000.0f;
-	UPROPERTY(EditInstanceOnly, Category = "Movement Testing")
+	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
 	float sprintSpeed = 10000.0f;
 	
 	/** Look Input Action */
@@ -145,7 +145,7 @@ public:
 	FVector2d GetHorizontalVelocity();
 	void EventJumpReset(int jumps);
 	void EventAnyDamage(float damage);
-	void EventOnLanded();
+	//void EventOnLanded();
 	bool LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType, FHitResult& hitResult);
 	
 	// macros
@@ -187,6 +187,9 @@ private:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex
 	);
+
+	virtual void Landed(const FHitResult& Hit) override;
+	virtual void NotifyJumpApex() override;
 	
 	//health system
 	bool isDead = false;
@@ -213,7 +216,10 @@ private:
 	// floats for wall climbing/running
 
 	float health;
-	float initialGravity;
+	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
+	float initialGravity = 2.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
+	float jumpGravity = 10.0f;
 	float fallingGravity;
 
 	//sprint variables
@@ -231,3 +237,10 @@ private:
 	float axisRight;
 	float axisForward;	
 };
+
+inline void ALivreCharacter::NotifyJumpApex()
+{
+	Super::NotifyJumpApex();
+
+	GetCharacterMovement()->GravityScale = jumpGravity;
+}
