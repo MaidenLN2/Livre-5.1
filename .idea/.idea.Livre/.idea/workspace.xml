@@ -5,14 +5,21 @@
     <projectFile>Intermediate/ProjectFiles/UE5.vcxproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="" />
+    <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/Holo_MenuText1.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text0_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text0_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text1_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text1_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text2_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text2_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text3_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text3_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text4_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text4_BP.uasset" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/../../../../../Program Files/Epic Games/UE_5.1/Engine/Source/Runtime/Engine/Private/Components/CharacterMovementComponent.cpp" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -35,9 +42,9 @@
   },
   "keyToStringList": {
     "rider.external.source.directories": [
-      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\ITLoanPC\\AppData\\Local\\Symbols\\src"
+      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\Blaike Harnett\\AppData\\Local\\Symbols\\src"
     ]
   }
 }]]></component>
@@ -239,6 +246,7 @@
       <workItem from="1680032058706" duration="636000" />
       <workItem from="1680034320847" duration="2681000" />
       <workItem from="1680073849281" duration="10331000" />
+      <workItem from="1680125076518" duration="848000" />
     </task>
     <servers />
   </component>
