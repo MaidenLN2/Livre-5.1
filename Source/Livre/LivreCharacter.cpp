@@ -73,7 +73,7 @@ ALivreCharacter::ALivreCharacter()
 void ALivreCharacter::BeginPlay()
 {
 	// call the base class  
-	Super::BeginPlay();
+ 	Super::BeginPlay();
 
 	//add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -83,7 +83,8 @@ void ALivreCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
+	GetCharacterMovement()->GravityScale = initialGravity;
+	GetCharacterMovement()->bNotifyApex = true;
 	// Event Graph Functionality:
 	EventJumpReset(maxJump);
 	GetCharacterMovement()->SetPlaneConstraintEnabled(false);
@@ -183,6 +184,7 @@ void ALivreCharacter::CustomJump()
 			EndWallRun(JumpOff);
 		}
 	}
+	
 	printf("CustomJump()");
 }
 
@@ -589,14 +591,14 @@ void ALivreCharacter::EventAnyDamage(float damage)
 	}
 }
 
-void ALivreCharacter::EventOnLanded()
-{
-	EventJumpReset(maxJump);
-
-	GetCharacterMovement()->GravityScale = initialGravity;
-
-	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
-}
+// void ALivreCharacter::EventOnLanded()
+// {
+// 	EventJumpReset(maxJump);
+//
+// 	GetCharacterMovement()->GravityScale = initialGravity;
+//
+// 	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
+// }
 
 bool ALivreCharacter::LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType,
 	FHitResult& hitResult)
@@ -779,7 +781,7 @@ void ALivreCharacter::EndWallRun(WallRunEnd why)
 		}
 
 		GetCharacterMovement()->AirControl = 0.05f;
-		GetCharacterMovement()->GravityScale = 1.0f; // why not working?
+		GetCharacterMovement()->GravityScale = initialGravity; // why not working?
 		isWallRunning = false;
 		isUpdatingWallRun = false;
 	}
@@ -814,6 +816,17 @@ void ALivreCharacter::WallDetectionEndOverlap(
 		wallToRunOn = nullptr;
 		EndWallRun(FallOff);
 	}
+}
+
+void ALivreCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	EventJumpReset(maxJump);
+	GetCharacterMovement()->bNotifyApex = true;
+	GetCharacterMovement()->GravityScale = initialGravity;
+
+	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
 }
 
 void ALivreCharacter::Move(const FInputActionValue& value)
