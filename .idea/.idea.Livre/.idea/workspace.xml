@@ -6,7 +6,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_3_Text1_BP.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,6 +244,7 @@
       <workItem from="1680125076518" duration="848000" />
       <workItem from="1680131917779" duration="1866000" />
       <workItem from="1680145266302" duration="620000" />
+      <workItem from="1680212674772" duration="615000" />
     </task>
     <servers />
   </component>
