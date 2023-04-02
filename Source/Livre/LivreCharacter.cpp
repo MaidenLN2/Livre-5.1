@@ -20,7 +20,6 @@
 
 /*
 LivreCharacter: Luiz Guilherme Ferreira Costa
-
 Age: 17
 Height: full capsule component
 Family: parents, grandmother and 6 older siblings 
