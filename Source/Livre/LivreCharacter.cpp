@@ -92,23 +92,28 @@ void ALivreCharacter::BeginPlay()
 	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // might need to be a BP specific function
 	
 	//timer functionality
-// 	currentLevel = *(GetWorld()->GetName());
-// 	
-// 	GetWorld()->GetTimerManager().SetTimer(timeLimit, [&]()
-// {
-// 	if (time > 0)
-// 	{
-// 		time--;
-// 		UE_LOG(LogTemp, Warning, TEXT("Time = %i"), time);
-// 	}
-// 	else if (time <= 0)
-// 	{
-// 		UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
-// 		GetWorld()->GetTimerManager().ClearTimer(timeLimit);
-// 		UGameplayStatics::OpenLevel(this, currentLevel, false);
-// 	}
-// }, 1.0, true);
+	currentLevel = GetWorld();
+	
+	GetWorld()->GetTimerManager().SetTimer(timeLimit, [&]()
+	{
+		if (time > 0)
+		{
+			time--;
+			UE_LOG(LogTemp, Warning, TEXT("Time = %i"), time);
+		}
+		else if (time <= 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
+			SafeLevelReload();
+		}
+	}, 1.0, true);
+}
 
+void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearTimer(timeLimit);	
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -455,8 +460,6 @@ void ALivreCharacter::UpdateWallRun()
     	GetCharacterMovement()->Velocity = speedByWallRunDirection;
     }
 	printf("update wall run");
-
-  	
 }
 
 void ALivreCharacter::ClampHorizontalVelocity()
@@ -616,6 +619,13 @@ bool ALivreCharacter::LineTrace(FVector startPos, FVector endPos, EDrawDebugTrac
 				);
 }
 
+void ALivreCharacter::SafeLevelReload()
+{
+	currentLevel->GetTimerManager().ClearAllTimersForObject(this);
+
+	UGameplayStatics::OpenLevelBySoftObjectPtr(this, TSoftObjectPtr<UWorld>(currentLevel), false);
+}
+
 void ALivreCharacter::CapsuleTouched(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
@@ -655,89 +665,6 @@ void ALivreCharacter::CapsuleTouched(
 
 void ALivreCharacter::BeginWallRun()
 {
-	
-	// FTimerHandle TestHandle;        // Can be declared inside the function and not worried about again
-	//
-	// GetWorld()->GetTimerManager().SetTimer(TestHandle, [&]()
-	// {
-	// 	if (!isUpdatingWallRun)
-	// 	{
-	// 		isUpdatingWallRun = true;
-	// 		GetWorld()->GetTimerManager().SetTimer(TestHandle, [&]()
-	// 		{
-	// 			EndWallRun(FallOff);
-	// 		}, -1.0f, false, timeDelay);
-	// 	}
-	// 	else
-	// 	{
-	// 		UpdateWallRun();
-	// 	}
-	// }, 0.01f, true);
-
-	/// LERA IMPLEMENTATION
-	// // sequence 0
-	// if (!isWallRunning)	// This check makes sure the function isn't called multiple times on activation. Once it activates once, it prevents it from starting again.
-	// {
-	// 	// Added check in here to see if the player is next to a wall before deciding to activate the wallrun.
-	// 	// Doesn't check for sides atm.
-	// 	FHitResult HitResultCapture;
-	// 	
-	// 	FVector rightTraceEnd = GetActorLocation() + (GetActorRightVector() * 250);
-	// 	bool rightLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
-	// 		this,
-	// 		GetActorLocation(),
-	// 		rightTraceEnd,
-	// 		UEngineTypes::ConvertToTraceType(ECC_Visibility),
-	// 		false,
-	// 		TArray<AActor*>(),
-	// 		EDrawDebugTrace::None,
-	// 		HitResultCapture,
-	// 		true
-	// 		);
-	//
-	// 	FVector leftTraceEnd = GetActorLocation() + (GetActorRightVector() * -250);
-	// 	bool leftLineTraceDidHit = UKismetSystemLibrary::LineTraceSingle(
-	// 		this,
-	// 		GetActorLocation(),
-	// 		leftTraceEnd,
-	// 		UEngineTypes::ConvertToTraceType(ECC_Visibility),
-	// 		false,
-	// 		TArray<AActor*>(),
-	// 		EDrawDebugTrace::None,
-	// 		HitResultCapture,
-	// 		true
-	// 		);
-	//
-	// 	// If we did detect a line trace, perform the function and let's wallrun!
-	// 	if (rightLineTraceDidHit || leftLineTraceDidHit)
-	// 	{
-	// 		if (rightLineTraceDidHit)
-	// 		{
-	// 			WallRunSide = Right;
-	// 		}
-	// 		else
-	// 		{
-	// 			WallRunSide = Left;
-	// 		}
-	// 		
-	// 		FTimerHandle BWR_Delayhandle;
-	// 		GetWorld()->GetTimerManager().SetTimer(BWR_Delayhandle, [&]()
-	// 		{
-	// 			// call End Wall Run
-	// 			EndWallRun(FallOff);
-	// 		}, 2, false);
-	//
-	// 		// sequence 1 where player runs on walls
-	// 		GetCharacterMovement()->AirControl = 1.0f;
-	// 		GetCharacterMovement()->GravityScale = 0.0f;
-	//
-	// 		isWallRunning = true;
-	// 		//  place for camera tilt begin
-	//
-	// 		// Timeline the UpdateWallRun function for 5 seconds
-	// 	}
-	// }
-
 	/// capsule implementation of wall running
 	if (!isWallRunning && wallToRunOn)
 	{
@@ -750,7 +677,7 @@ void ALivreCharacter::BeginWallRun()
 
 		// sequence 1 where player runs on walls
 		GetCharacterMovement()->AirControl = 1.0f;
-		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->GravityScale = 0.5f;
 
 		isWallRunning = true;
 	}
@@ -781,7 +708,7 @@ void ALivreCharacter::EndWallRun(WallRunEnd why)
 		}
 
 		GetCharacterMovement()->AirControl = 0.05f;
-		GetCharacterMovement()->GravityScale = initialGravity; // why not working?
+		GetCharacterMovement()->GravityScale = initialGravity; 
 		isWallRunning = false;
 		isUpdatingWallRun = false;
 	}
