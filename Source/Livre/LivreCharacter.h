@@ -47,6 +47,7 @@ class ALivreCharacter : public ACharacter
 protected:
 	
 	virtual void BeginPlay();
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& value);
@@ -81,9 +82,9 @@ public:
 	ALivreCharacter();
 
 	// movement floats for accessibility in editor
-	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float walkSpeed = 5000.0f;
-	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float sprintSpeed = 10000.0f;
 	
 	/** Look Input Action */
@@ -125,10 +126,10 @@ public:
 	//profile collision function
 	FCollisionQueryParams GetIgnoreCharacterParams();
 	
-	// timer variables
+	// timer and world variables
 	int time = 180;
 	FTimerHandle timeLimit;
-	FName currentLevel;
+	UWorld* currentLevel;
 	
 	//general functions
 	void StartSprint(float newSprintSpeed = 1750.0f);
@@ -147,6 +148,7 @@ public:
 	void EventAnyDamage(float damage);
 	//void EventOnLanded();
 	bool LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType, FHitResult& hitResult);
+	void SafeLevelReload();
 	
 	// macros
 	bool JumpUsed();
@@ -216,9 +218,9 @@ private:
 	// floats for wall climbing/running
 
 	float health;
-	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float initialGravity = 2.0f;
-	UPROPERTY(EditDefaultsOnly, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float jumpGravity = 10.0f;
 	float fallingGravity;
 
@@ -242,5 +244,8 @@ inline void ALivreCharacter::NotifyJumpApex()
 {
 	Super::NotifyJumpApex();
 
-	GetCharacterMovement()->GravityScale = jumpGravity;
+	if (!isWallRunning)
+	{
+		GetCharacterMovement()->GravityScale = jumpGravity;
+	}
 }
