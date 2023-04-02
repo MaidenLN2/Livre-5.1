@@ -86,6 +86,8 @@ public:
 	float walkSpeed = 5000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float sprintSpeed = 10000.0f;
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	float slideForce = 2500.0f;
 	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
