@@ -251,3 +251,5 @@ inline void ALivreCharacter::NotifyJumpApex()
 		GetCharacterMovement()->GravityScale = jumpGravity;
 	}
 }
+
+/// 
