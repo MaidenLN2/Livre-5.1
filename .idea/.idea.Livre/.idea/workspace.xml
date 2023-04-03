@@ -8,8 +8,6 @@
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -252,6 +250,7 @@
       <workItem from="1680520551021" duration="1065000" />
       <workItem from="1680549751861" duration="614000" />
       <workItem from="1680551646215" duration="617000" />
+      <workItem from="1680557338911" duration="308000" />
     </task>
     <servers />
   </component>
