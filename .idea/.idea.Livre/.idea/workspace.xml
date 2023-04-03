@@ -6,11 +6,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2_Plain.umap" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3_Plain.umap" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_Plain.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryCaution1.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Props/Sewer_ModuleKit/WallBase_Col.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Props/Sewer_ModuleKit/WallCornerBaseOut_Col.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_Plain.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_Plain.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryCaution.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryCaution.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryLaser.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryLaser.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryPath.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/LevelPrototyping/CustomMeshes/L3/FactoryPath.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/StarterContent/Materials/M_Water_Lake.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/StarterContent/Materials/M_Water_Lake.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/StarterContent/Materials/M_Water_Ocean.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/StarterContent/Materials/M_Water_Ocean.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text2_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text2_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text3_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text3_BP.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -248,6 +256,7 @@
       <workItem from="1680477485416" duration="751000" />
       <workItem from="1680478720897" duration="225000" />
       <workItem from="1680490328091" duration="102000" />
+      <workItem from="1680490540900" duration="609000" />
     </task>
     <servers />
   </component>
