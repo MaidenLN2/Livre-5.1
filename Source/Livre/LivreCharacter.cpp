@@ -133,8 +133,8 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
  		enhancedInputComponent->BindAction(lookAction, ETriggerEvent::Started, this, &ALivreCharacter::Look);
 
 		//Sprinting
- 		enhancedInputComponent->BindAction(sprintAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSprintPressed);
- 		enhancedInputComponent->BindAction(sprintAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSprintReleased);	// stops the player from sprinting
+ 		enhancedInputComponent->BindAction(walkAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomWalkPressed);
+ 		enhancedInputComponent->BindAction(walkAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomWalkReleased);	// stops the player from sprinting
 
  		//Sliding
  		enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
@@ -206,29 +206,29 @@ void ALivreCharacter::CustomJumpEnded()
 	StopJumping();
 }
 // Sprinting functionality
-void ALivreCharacter::CustomSprintPressed()
+void ALivreCharacter::CustomWalkPressed()
 {
-	if (!isSprinting)
+	if (!isWalking)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("StartSprint from CustomSprintPressed"));
 	}
-	isSprinting = true;
-	StartSprint();
+	isWalking = true;
+	StartWalk();
 }
 
-void ALivreCharacter::CustomSprintReleased()
+void ALivreCharacter::CustomWalkReleased()
 {
-	if (isSprinting)
+	if (isWalking)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("StopSprint from CustomSprintReleased"));
 	}
-	isSprinting = false;
-	StopSprint();
+	isWalking = false;
+	StopWalk();
 }
 //Sliding functionality
 void ALivreCharacter::CustomSlidePressed()
 {
-	if (isSprinting && !GetCharacterMovement()->IsFalling())
+	if (isWalking && !GetCharacterMovement()->IsFalling())
 	{
 		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
 		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -403,15 +403,15 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 }
 
 // Setting running speed
-void ALivreCharacter::StartSprint(float newSprintSpeed)
+void ALivreCharacter::StartWalk(float newWalkSpeed)
 {
-	GetCharacterMovement()->MaxWalkSpeed = newSprintSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = newWalkSpeed;
 }
 
 // Changing sprinting speed to walking speed
-void ALivreCharacter::StopSprint(float newWalkSpeed)
+void ALivreCharacter::StopWalk(float newNormalSpeed)
 {
-	GetCharacterMovement()->MaxWalkSpeed = newWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = newNormalSpeed;
 }
 
 // Setting movement velocity

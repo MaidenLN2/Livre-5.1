@@ -83,9 +83,9 @@ public:
 
 	// movement floats for accessibility in editor
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float walkSpeed = 5000.0f;
+	float normalSpeed = 10000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float sprintSpeed = 10000.0f;
+	float sprintSpeed = 5000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideForce = 2500.0f;
 	
@@ -94,7 +94,7 @@ public:
 	class UInputAction* lookAction;
 	/** Sprint Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* sprintAction;
+	class UInputAction* walkAction;
 	/** Slide Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* slideAction;
@@ -113,8 +113,8 @@ public:
 	// InputAction Overrides
 	void CustomJump();
 	void CustomJumpEnded();
-	void CustomSprintPressed();
-	void CustomSprintReleased();
+	void CustomWalkPressed();
+	void CustomWalkReleased();
 	void CustomSlidePressed();
 	void CustomSlideReleased();
 	void CustomVaultingPressed();
@@ -134,8 +134,8 @@ public:
 	UWorld* currentLevel;
 	
 	//general functions
-	void StartSprint(float newSprintSpeed = 1750.0f);
-	void StopSprint(float newWalkSpeed = 1000.0f);
+	void StartWalk(float newWalkSpeed = 1750.0f);
+	void StopWalk(float newNormalSpeed = 10000.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
 	void ClampHorizontalVelocity();	// expose to blueprints as this character doesn't have tick for some reason
@@ -212,7 +212,7 @@ private:
 	bool wallIsThick = false;
 	bool canClimb = true;
 	bool isClimbing = false;
-	bool isSprinting = false;
+	bool isWalking = false;
 
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
@@ -226,7 +226,7 @@ private:
 	float jumpGravity = 10.0f;
 	float fallingGravity;
 
-	//sprint variables
+	//walk variables
 	float defaultMaxWalkingSpeed = 0.0f;
 
 	// wall running variables
