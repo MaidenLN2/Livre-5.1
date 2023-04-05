@@ -65,7 +65,10 @@ ALivreCharacter::ALivreCharacter()
 	wallDetectionCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	
 	// Connecting Collision Detection Functions
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);	// might work?
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);
+
+	// Setting default speed
+	GetCharacterMovement()->MaxWalkSpeed = 10000.0f;
 
 }
 
@@ -132,9 +135,9 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 // 		//Looking
  		enhancedInputComponent->BindAction(lookAction, ETriggerEvent::Started, this, &ALivreCharacter::Look);
 
-		//Sprinting
+		//Walking
  		enhancedInputComponent->BindAction(walkAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomWalkPressed);
- 		enhancedInputComponent->BindAction(walkAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomWalkReleased);	// stops the player from sprinting
+ 		enhancedInputComponent->BindAction(walkAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomWalkReleased);	// stops the player from walking
 
  		//Sliding
  		enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
@@ -228,14 +231,14 @@ void ALivreCharacter::CustomWalkReleased()
 //Sliding functionality
 void ALivreCharacter::CustomSlidePressed()
 {
-	if (isWalking && !GetCharacterMovement()->IsFalling())
+	if (!GetCharacterMovement()->IsFalling())
 	{
 		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
 		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	LaunchCharacter(GetActorForwardVector() * 2500.0f, true, false);
+	LaunchCharacter(GetActorForwardVector() * slideForce, true, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
 }
@@ -402,13 +405,13 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 	return parametres;
 }
 
-// Setting running speed
+// Setting walking speed
 void ALivreCharacter::StartWalk(float newWalkSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = newWalkSpeed;
 }
 
-// Changing sprinting speed to walking speed
+// Changing walkin speed to running speed
 void ALivreCharacter::StopWalk(float newNormalSpeed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = newNormalSpeed;
@@ -455,10 +458,10 @@ void ALivreCharacter::UpdateWallRun()
     		cardinalForward = negativeY;
     	}    
   	
-    	FVector speedByWallRunDirection = FVector(-cardinalForward, GetFirstPersonCameraComponent()->GetForwardVector().Z) * GetCharacterMovement()->GetMaxSpeed();
+    	FVector speedByWallRunDirection = FVector(-cardinalForward, GetFirstPersonCameraComponent()->GetForwardVector().Z) * wallRunSpeed;
     	GetCharacterMovement()->Velocity = speedByWallRunDirection;
     }
-	printf("update wall run");
+	
 }
 
 void ALivreCharacter::ClampHorizontalVelocity()
@@ -593,15 +596,6 @@ void ALivreCharacter::EventAnyDamage(float damage)
 	}
 }
 
-// void ALivreCharacter::EventOnLanded()
-// {
-// 	EventJumpReset(maxJump);
-//
-// 	GetCharacterMovement()->GravityScale = initialGravity;
-//
-// 	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
-// }
-
 bool ALivreCharacter::LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType,
 	FHitResult& hitResult)
 {
@@ -665,7 +659,7 @@ void ALivreCharacter::CapsuleTouched(
 void ALivreCharacter::BeginWallRun()
 {
 	/// capsule implementation of wall running
-	if (!isWallRunning && wallToRunOn)
+	if (!isWallRunning && wallToRunOn && hasLandedAfterWallRun)
 	{
 		FTimerHandle bwrDelayhandle;
 		GetWorld()->GetTimerManager().SetTimer(bwrDelayhandle, [&]()
@@ -677,18 +671,16 @@ void ALivreCharacter::BeginWallRun()
 		// sequence 1 where player runs on walls
 		GetCharacterMovement()->AirControl = 1.0f;
 		GetCharacterMovement()->GravityScale = 0.5f;
-
+		
 		isWallRunning = true;
+		hasLandedAfterWallRun = false;
 	}
 }
 
 
 void ALivreCharacter::CallEndWallRun()
 {
-	if (isWallRunning)
-	{
-		EndWallRun(FallOff);
-	}
+	EndWallRun(FallOff);
 }
 
 void ALivreCharacter::EndWallRun(WallRunEnd why)
@@ -751,6 +743,7 @@ void ALivreCharacter::Landed(const FHitResult& Hit)
 	EventJumpReset(maxJump);
 	GetCharacterMovement()->bNotifyApex = true;
 	GetCharacterMovement()->GravityScale = initialGravity;
+	hasLandedAfterWallRun = true;
 
 	UGameplayStatics::PlayWorldCameraShake(this, TSubclassOf<UCameraShakeBase>(), GetActorLocation(), 0.0f, 100.0f, 1.0f);
 }

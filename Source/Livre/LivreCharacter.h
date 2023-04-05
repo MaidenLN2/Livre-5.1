@@ -85,14 +85,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float normalSpeed = 10000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float sprintSpeed = 5000.0f;
+	float walkSpeed = 5000.0f;
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	float wallRunSpeed = 1000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideForce = 2500.0f;
 	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* lookAction;
-	/** Sprint Input Action */
+	/** Walk Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* walkAction;
 	/** Slide Input Action */
@@ -134,7 +136,7 @@ public:
 	UWorld* currentLevel;
 	
 	//general functions
-	void StartWalk(float newWalkSpeed = 1750.0f);
+	void StartWalk(float newWalkSpeed = 1000.0f);
 	void StopWalk(float newNormalSpeed = 10000.0f);
 	void SetHorizontalVelocity(float velocityX,float velocityY);
 	void UpdateWallRun();
@@ -148,7 +150,6 @@ public:
 	FVector2d GetHorizontalVelocity();
 	void EventJumpReset(int jumps);
 	void EventAnyDamage(float damage);
-	//void EventOnLanded();
 	bool LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType, FHitResult& hitResult);
 	void SafeLevelReload();
 	
@@ -213,9 +214,11 @@ private:
 	bool canClimb = true;
 	bool isClimbing = false;
 	bool isWalking = false;
+	bool hasLandedAfterWallRun = true;
 
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
+	bool doOnce = true;
 
 	// floats for wall climbing/running
 
