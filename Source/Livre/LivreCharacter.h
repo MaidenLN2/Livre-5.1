@@ -131,6 +131,7 @@ public:
 	FCollisionQueryParams GetIgnoreCharacterParams();
 	
 	// timer and world global variables
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	int time = 180;
 	FTimerHandle timeLimit;
 	FTimerHandle delayHandle;
