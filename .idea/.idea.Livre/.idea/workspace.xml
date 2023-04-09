@@ -30,11 +30,19 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;UnrealLinkOptionsId&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
+<<<<<<< Updated upstream
   &quot;keyToStringList&quot;: {
     &quot;rider.external.source.directories&quot;: [
       &quot;C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache&quot;,
       &quot;C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache&quot;,
       &quot;C:\\Users\\ITLoanPC\\AppData\\Local\\Symbols\\src&quot;
+=======
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\ITLoanPC\\AppData\\Local\\Symbols\\src"
+>>>>>>> Stashed changes
     ]
   }
 }</component>
@@ -245,6 +253,13 @@
       <workItem from="1680576812266" duration="619000" />
       <workItem from="1680657115280" duration="10083000" />
       <workItem from="1680857870336" duration="3735000" />
+<<<<<<< Updated upstream
+=======
+      <workItem from="1680948308957" duration="37000" />
+      <workItem from="1680948386102" duration="2056000" />
+      <workItem from="1681009013160" duration="1422000" />
+      <workItem from="1681028684852" duration="1956000" />
+>>>>>>> Stashed changes
     </task>
     <servers />
   </component>
