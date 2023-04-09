@@ -90,6 +90,8 @@ public:
 	float wallRunSpeed = 1000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideForce = 2500.0f;
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	float slideTime = 0.4f;
 	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -119,8 +121,6 @@ public:
 	void CustomWalkReleased();
 	void CustomSlidePressed();
 	void CustomSlideReleased();
-	void CustomVaultingPressed();
-	void CustomVaultingReleased();
 	
 	// wall events
 	void BeginWallRun();
@@ -130,9 +130,13 @@ public:
 	//profile collision function
 	FCollisionQueryParams GetIgnoreCharacterParams();
 	
-	// timer and world variables
+	// timer and world global variables
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	int time = 180;
 	FTimerHandle timeLimit;
+	FTimerHandle delayHandle;
+	FTimerHandle resetJumps;
+	FTimerHandle internalTimerHandle;
 	UWorld* currentLevel;
 	
 	//general functions
@@ -215,6 +219,7 @@ private:
 	bool isClimbing = false;
 	bool isWalking = false;
 	bool hasLandedAfterWallRun = true;
+	bool wasSlidingLongTime = false;
 
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;

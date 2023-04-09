@@ -115,7 +115,10 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	GetWorld()->GetTimerManager().ClearTimer(timeLimit);	
+	GetWorld()->GetTimerManager().ClearTimer(timeLimit);
+	GetWorld()->GetTimerManager().ClearTimer(delayHandle);
+	GetWorld()->GetTimerManager().ClearTimer(resetJumps);
+	GetWorld()->GetTimerManager().ClearTimer(internalTimerHandle);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -141,7 +144,7 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
  		//Sliding
  		enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
- 		enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
+ 		//enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
 
  		//Wallrunning
  		enhancedInputComponent->BindAction(wallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
@@ -200,7 +203,6 @@ void ALivreCharacter::CustomJumpEnded()
 {
 	if (jumpLeft == 0)
 	{
-		FTimerHandle resetJumps;
 		GetWorld()->GetTimerManager().SetTimer(resetJumps, [&]()
 		{
 			EventJumpReset(maxJump);
@@ -231,15 +233,21 @@ void ALivreCharacter::CustomWalkReleased()
 //Sliding functionality
 void ALivreCharacter::CustomSlidePressed()
 {
-	if (!GetCharacterMovement()->IsFalling())
+	if (!GetCharacterMovement()->IsFalling() && !wasSlidingLongTime)
 	{
-		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
-		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+     	GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
+     	{
+     		CustomSlideReleased();
+     	}, slideTime, false);
 
-	LaunchCharacter(GetActorForwardVector() * slideForce, true, false);
+		wasSlidingLongTime = true;
+		
+		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
+		LaunchCharacter(GetActorForwardVector() * slideForce, true, false);		
+		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+
+	
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
 }
 
@@ -247,149 +255,13 @@ void ALivreCharacter::CustomSlideReleased()
 {
 
 	UKismetSystemLibrary::PrintString(this, "Sliding Happened After Animation");
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-	FTimerHandle CSP_InternalTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(CSP_InternalTimerHandle, [&]()
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	if (wasSlidingLongTime)
 	{
+		wasSlidingLongTime = false;
 		GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
-	}, 0.5f, false);
-	
-	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
-}
-
-// Vaulting functionality (in progress, not present in game atm)
-// start vaulting
-void ALivreCharacter::CustomVaultingPressed()
-{
-	FVector startPos = GetActorLocation() - FVector(0.0, 0.0, 44.0);
-	FVector endPos = startPos + (GetActorForwardVector() * 70.0f); 
-	FHitResult hitTracking;
-	// look more in here
-	bool firstLineTraceDidHit = LineTrace(startPos, endPos, EDrawDebugTrace::ForDuration, hitTracking);
-
-	if (firstLineTraceDidHit)
-	{
-		wallLocation = hitTracking.Location;
-		wallNormal = hitTracking.Normal;
-		
-		FVector endPos2 = (
-			wallLocation +
-			(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * -10.0f)
-			);
-		FVector startPos2 = endPos2 - FVector(0.0f, 0.0f, 200.0f);
-		FHitResult hitTracking2;
-		
-		bool secondLineTraceDidHit = LineTrace(startPos2, endPos2, EDrawDebugTrace::ForDuration, hitTracking2);
-
-		if (secondLineTraceDidHit)
-		{
-			wallHeight = hitTracking2.Location;
-				// sequence 0
-				aboutToClimb = ((wallHeight - wallLocation).Z > 60.0f);
-
-				// sequence 1
-				FVector startPos3 = (
-					wallLocation +
-					(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * -50.0f) +
-					FVector(0.0f, 0.0f, 250.0f)
-					);
-			
-				FVector endPos3 = startPos3 - FVector(0.0f, 0.0f, 300.0f);
-				FHitResult hitTracking3;
-
-			bool thirdLineTraceDidHit = LineTrace(startPos3, endPos3, EDrawDebugTrace::ForDuration, hitTracking3);
-
-			if (thirdLineTraceDidHit)
-			{
-				wallHeight2 = hitTracking3.Location;
-				wallIsThick = (wallHeight - wallHeight2).Z <= 30.0f;	//  negation was removed for simplicity
-			}
-			else
-			{
-				wallIsThick = false;
-			}
-
-			if (aboutToClimb)
-			{
-				// sequence 0
-				FVector startPos4 = GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);		
-				bool fourthLineTraceDidHit = LineTrace(startPos4, startPos4 + GetActorForwardVector() * 70.0f, EDrawDebugTrace::ForDuration, hitTracking3);
-
-				if (fourthLineTraceDidHit) canClimb = false;
-				
-				// this last trace might be unnecessary, none of the outputs are used.
-				bool FifthLineTraceDidHit = LineTrace(GetActorLocation(), GetActorLocation() + FVector(0.0f, 0.0f, 200.0f), EDrawDebugTrace::ForDuration, hitTracking3);
-
-					// sequence 1
-					if (canClimb)
-					{
-						GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-						GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-						SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
-						
-						SetActorLocation(UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * 50.0f + GetActorLocation());
-						SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 44.0f));
-					
-							// play anim montage here
-							// duration = PlayAnimMontage();
-							float duration = 4.0f;
-
-							UKismetSystemLibrary::PrintString(this, "landing happened after animation");
-
-							FTimerHandle CVP_ClimbTimerHandle;
-							GetWorld()->GetTimerManager().SetTimer(CVP_ClimbTimerHandle, [&]()
-							{
-								GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-								GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-							}, duration, false);
-					}
-			}
-			
-			else
-				
-			{
-				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-
-				FVector newActorLocation = (UKismetMathLibrary::GetForwardVector(UKismetMathLibrary::MakeRotFromX(wallNormal)) * 50.0f) + GetActorLocation();
-				SetActorLocation(newActorLocation);
-
-				float duration;
-				if (wallIsThick)
-					{
-						// getting Up Animation goes here
-						// duration = PlayAnimMontage();
-						duration = 4.0f;
-					}
-				
-				else
-					
-					{
-						SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, wallHeight.Z - 20.0f));
-						
-						// duration = PlayAnimMontage();
-						duration = 3.0f;
-						UKismetSystemLibrary::PrintString(this, "vaulting happened after animation");
-					}
-				
-						FTimerHandle cvpTimerHandle;
-						GetWorld()->GetTimerManager().SetTimer(cvpTimerHandle, [&]()
-						{
-							GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-							GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-							SetActorRotation(FRotator(GetActorRotation().Roll, GetActorRotation().Pitch, UKismetMathLibrary::MakeRotFromX(wallNormal).Yaw + 180.0f));
-						}, duration, false);
-
-				
-			}
-		}
 	}
-}
-//End vaulting
-void ALivreCharacter::CustomVaultingReleased()
-{
-	
+	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
 }
 
 // Custom collision profile
@@ -661,8 +533,7 @@ void ALivreCharacter::BeginWallRun()
 	/// capsule implementation of wall running
 	if (!isWallRunning && wallToRunOn && hasLandedAfterWallRun)
 	{
-		FTimerHandle bwrDelayhandle;
-		GetWorld()->GetTimerManager().SetTimer(bwrDelayhandle, [&]()
+		GetWorld()->GetTimerManager().SetTimer(delayHandle, [&]()
 		{
 			// call End Wall Run
 			EndWallRun(FallOff);
