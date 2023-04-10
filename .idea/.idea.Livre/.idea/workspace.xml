@@ -5,7 +5,30 @@
     <projectFile>Intermediate/ProjectFiles/UE5.vcxproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="" />
+    <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Content/Draft_Levels/L3_Mini.umap" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_Shell.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_cannon.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/Damage_WIDG.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_3_Text2.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_2.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_2.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_3.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_3.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2C_R1.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2C_R1.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/LM_Pre.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/LM_Pre.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_Bullet.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_Bullet.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_turrets.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_turrets.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_2_Text1_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_2_Text1_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_3_Text1_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_3_Text1_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text2_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text2_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/L2_Mini_Text4_BP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/L2_Mini_Text4_BP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay_MainMenu2.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/SedgwickAveDisplay_MainMenu2.uasset" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,9 +55,9 @@
   },
   "keyToStringList": {
     "rider.external.source.directories": [
-      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\ITLoanPC\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\ITLoanPC\\AppData\\Local\\Symbols\\src"
+      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\Blaike Harnett\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\Blaike Harnett\\AppData\\Local\\Symbols\\src"
     ]
   }
 }]]></component>
@@ -250,6 +273,7 @@
       <workItem from="1681009013160" duration="1422000" />
       <workItem from="1681082670019" duration="828000" />
       <workItem from="1681094407381" duration="220000" />
+      <workItem from="1681148357739" duration="604000" />
     </task>
     <servers />
   </component>
