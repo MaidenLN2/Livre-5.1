@@ -6,20 +6,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc4f7c7f-dfe2-4028-9e94-afb7da8e8527" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Content/UI/L3_Mini_Text_BP.uasset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/UI/Reticle_WIDG.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Livre/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_2.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_2.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_3.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L1_Mini_3.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_2.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L2_Mini_3.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/L3_Mini.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/L3_Mini.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Draft_Levels/LM_Pre.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Draft_Levels/LM_Pre.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPerson/Blueprints/MyLivreCharacter.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_Shell.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Props/stationary_turrets/BP_Shell.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Widgets/Timer_WIDG.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Widgets/Timer_WIDG.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -268,6 +256,7 @@
       <workItem from="1681148357739" duration="604000" />
       <workItem from="1681161587015" duration="283000" />
       <workItem from="1681162148014" duration="614000" />
+      <workItem from="1681274467193" duration="614000" />
     </task>
     <servers />
   </component>
