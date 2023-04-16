@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <tuple>
 #include "InputActionValue.h"
+#include "Components/TimelineComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "LivreCharacter.generated.h"
 
@@ -94,6 +95,7 @@ public:
 	float dashTime = 0.7f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideTime = 0.7f;
+	
 	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -185,7 +187,7 @@ private:
 	UPROPERTY(EditInstanceOnly)
 	UCapsuleComponent* wallDetectionCapsule;
 
-	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
+	UFUNCTION()	
 	void WallDetectionBeginOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -195,7 +197,7 @@ private:
 		const FHitResult &SweepResult
 	);
 	
-	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
+	UFUNCTION()	
 	void WallDetectionEndOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -226,7 +228,7 @@ private:
 	bool isWalking = false;
 	bool hasLandedAfterWallRun = true;
 	bool wasSlidingLongTime = false;
-
+	bool isWallRunningLong = false;
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
 	bool doOnce = true;
@@ -249,11 +251,14 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta =(AllowPrivateAccess = "true"))
 	bool isWallRunning;
 	bool isUpdatingWallRun = false;
+
 	int timeDelay = 5;
 	int jumpLeft;
 	const int maxJump = 2;
 	float axisRight;
-	float axisForward;	
+	float axisForward;
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	float wallrunTime = 5.0;
 };
 
 inline void ALivreCharacter::NotifyJumpApex()
