@@ -68,7 +68,7 @@ ALivreCharacter::ALivreCharacter()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);
 
 	// Setting default speed
-	GetCharacterMovement()->MaxWalkSpeed = 10000.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
 
 }
 
@@ -141,6 +141,9 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		//Walking
  		enhancedInputComponent->BindAction(walkAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomWalkPressed);
  		enhancedInputComponent->BindAction(walkAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomWalkReleased);	// stops the player from walking
+
+ 		//Dashin
+ 		enhancedInputComponent->BindAction(dashAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomDashPressed);
 
  		//Sliding
  		enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
@@ -231,36 +234,39 @@ void ALivreCharacter::CustomWalkReleased()
 	StopWalk();
 }
 //Sliding functionality
+void ALivreCharacter::CustomDashPressed()
+{
+     	GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, dashTime, false);
+		LaunchCharacter(GetActorForwardVector() * dashForce, true, false);		
+}
+
 void ALivreCharacter::CustomSlidePressed()
 {
 	if (!GetCharacterMovement()->IsFalling() && !wasSlidingLongTime)
 	{
-     	GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
-     	{
-     		CustomSlideReleased();
-     	}, slideTime, false);
+	GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
+	{
+		CustomSlideReleased();
+	}, slideTime, false);
 
-		wasSlidingLongTime = true;
+	wasSlidingLongTime = true;
 		
-		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
-		LaunchCharacter(GetActorForwardVector() * slideForce, true, false);		
-		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
+	LaunchCharacter(GetActorForwardVector() * dashForce, true, false);		
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
-
-	
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
 }
 
 void ALivreCharacter::CustomSlideReleased()
 {
-
 	UKismetSystemLibrary::PrintString(this, "Sliding Happened After Animation");
-	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	if (wasSlidingLongTime)
-	{
-		wasSlidingLongTime = false;
-		GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
-	}
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	 if (wasSlidingLongTime)
+	 {
+	 	wasSlidingLongTime = false;
+	 	GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
+	 }
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
 }
 
@@ -300,40 +306,36 @@ void ALivreCharacter::StopWalk(float newNormalSpeed)
 // What is happening during actual wall run (math)
 void ALivreCharacter::UpdateWallRun()
 {
-    if (wallToRunOn && isWallRunning)
-    {
-    	FVector2D cardinalForward;
-    	FVector2D positiveX(1.0f, 0.0f);
-    	FVector2D negativeX(-1.0f, 0.0f);
-    	FVector2D positiveY(0.0f, 1.0f);
-    	FVector2D negativeY(0.0f, -1.0f);
-    	FVector2D actorForward(GetActorForwardVector());
-    	float dotProduct = 999999;
 
-    	if (float newProduct = FVector2D::DotProduct(actorForward, positiveX); newProduct < dotProduct)
-    	{
-    		dotProduct = newProduct;
-    		cardinalForward = positiveX;
-    	}
-    	if (float newProduct = FVector2D::DotProduct(actorForward, negativeX); newProduct < dotProduct)
-    	{
-    		dotProduct = newProduct;
-    		cardinalForward = negativeX;
-    	}
-    	if (float newProduct = FVector2D::DotProduct(actorForward, positiveY); newProduct < dotProduct)
-    	{
-    		dotProduct = newProduct;
-    		cardinalForward = positiveY;
-    	}
-    	if (float newProduct = FVector2D::DotProduct(actorForward, negativeY); newProduct < dotProduct)
-    	{
-    		cardinalForward = negativeY;
-    	}    
-  	
-    	FVector speedByWallRunDirection = FVector(-cardinalForward, GetFirstPersonCameraComponent()->GetForwardVector().Z) * wallRunSpeed;
-    	GetCharacterMovement()->Velocity = speedByWallRunDirection;
-    }
+
+	if (isWallRunning)
+	{	UE_LOG(LogTemp, Warning, TEXT("Start UpdateWallrun"));
+		const FVector startPos = GetActorLocation();
+		const FVector endPos = GetActorLocation() + (GetActorRightVector() * 250 * (wallRunSide == Left ? 1.0f : -1.0f));
+		FHitResult hitResult;
+
+		bool didHit = LineTrace(startPos, endPos,  EDrawDebugTrace::ForDuration, hitResult);
+
+		if (!didHit)
+		{
+			EndWallRun(FallOff);
+		}
+		else
+		{
+		
+			auto [direction, sideLocal] = FindRunDirectionAndSide(hitResult.ImpactNormal);
+
+			if (!wallRunSide == sideLocal)
+			{
+				EndWallRun(FallOff);
+			}
 	
+			wallRunDirection = direction;
+			GetCharacterMovement()->Velocity = FVector(FVector2D(wallRunDirection * GetCharacterMovement()->GetMaxSpeed()), 0.0f);
+		}
+		UE_LOG(LogTemp, Warning, TEXT("End UpdateWallrun"));
+	}
+
 }
 
 void ALivreCharacter::ClampHorizontalVelocity()
@@ -422,11 +424,11 @@ bool ALivreCharacter::AreKeysRequired()
 	const FVector2D actorForwardVector2D(GetActorForwardVector());
 	//const FVector2D actorRightVector2D(GetActorRightVector());
 
-	const float DotForward = FVector2D::DotProduct(currentVelocity, actorForwardVector2D);
+	const float dotForward = FVector2D::DotProduct(currentVelocity, actorForwardVector2D);
 
-	UE_LOG(LogTemp, Warning, TEXT("DotForward = %f"), DotForward);
+	UE_LOG(LogTemp, Warning, TEXT("DotForward = %f"), dotForward);
 
-	if (DotForward > 90)
+	if (dotForward > 90)
 	{
 		return true;
 	}
@@ -468,20 +470,19 @@ void ALivreCharacter::EventAnyDamage(float damage)
 	}
 }
 
-bool ALivreCharacter::LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType,
-	FHitResult& hitResult)
+bool ALivreCharacter::LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType, FHitResult& hitResult)
 {
-	return UKismetSystemLibrary::LineTraceSingleForObjects(
-				this,                                     
-				startPos,       
-				endPos,         
-				TArray<TEnumAsByte<EObjectTypeQuery>>(),  
-				true,                                      
-				TArray<AActor*>(),                         
-				durationType,   
-				hitResult,       
-				true                                       
-				);
+	return UKismetSystemLibrary::LineTraceSingle(
+	this,
+	startPos,
+	endPos,
+	static_cast<ETraceTypeQuery>(ECC_Visibility),
+	false,
+	TArray<AActor*>(),
+	durationType,
+	hitResult,
+	true
+	);
 }
 
 void ALivreCharacter::SafeLevelReload()
@@ -537,7 +538,7 @@ void ALivreCharacter::BeginWallRun()
 		{
 			// call End Wall Run
 			EndWallRun(FallOff);
-		}, 2, false);
+		}, wallrunTime, false);
 
 		// sequence 1 where player runs on walls
 		GetCharacterMovement()->AirControl = 1.0f;

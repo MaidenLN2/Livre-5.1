@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <tuple>
 #include "InputActionValue.h"
+#include "Components/TimelineComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "LivreCharacter.generated.h"
 
@@ -83,15 +84,18 @@ public:
 
 	// movement floats for accessibility in editor
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float normalSpeed = 10000.0f;
+	float normalSpeed = 1000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float walkSpeed = 5000.0f;
+	float walkSpeed = 250.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float wallRunSpeed = 1000.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float slideForce = 2500.0f;
+	float dashForce = 2500.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float slideTime = 0.4f;
+	float dashTime = 0.7f;
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	float slideTime = 0.7f;
+	
 	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -99,7 +103,9 @@ public:
 	/** Walk Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* walkAction;
-	/** Slide Input Action */
+	/** Dash Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* dashAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* slideAction;
 	/** Wallrun Input Action */
@@ -119,6 +125,8 @@ public:
 	void CustomJumpEnded();
 	void CustomWalkPressed();
 	void CustomWalkReleased();
+	void CustomDashPressed();
+	//void CustomDashReleased();
 	void CustomSlidePressed();
 	void CustomSlideReleased();
 	
@@ -179,7 +187,7 @@ private:
 	UPROPERTY(EditInstanceOnly)
 	UCapsuleComponent* wallDetectionCapsule;
 
-	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
+	UFUNCTION()	
 	void WallDetectionBeginOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -189,7 +197,7 @@ private:
 		const FHitResult &SweepResult
 	);
 	
-	UFUNCTION()	// not sure if this will work, the CapsuleComponent is protected and therefore inaccessible
+	UFUNCTION()	
 	void WallDetectionEndOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -220,7 +228,7 @@ private:
 	bool isWalking = false;
 	bool hasLandedAfterWallRun = true;
 	bool wasSlidingLongTime = false;
-
+	bool isWallRunningLong = false;
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
 	bool doOnce = true;
@@ -229,9 +237,9 @@ private:
 
 	float health;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float initialGravity = 2.0f;
+	float initialGravity = 1.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
-	float jumpGravity = 10.0f;
+	float jumpGravity = 1.0f;
 	float fallingGravity;
 
 	//walk variables
@@ -243,11 +251,14 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta =(AllowPrivateAccess = "true"))
 	bool isWallRunning;
 	bool isUpdatingWallRun = false;
+
 	int timeDelay = 5;
 	int jumpLeft;
 	const int maxJump = 2;
 	float axisRight;
-	float axisForward;	
+	float axisForward;
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	float wallrunTime = 5.0;
 };
 
 inline void ALivreCharacter::NotifyJumpApex()
