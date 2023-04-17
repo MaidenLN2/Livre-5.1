@@ -7,8 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <tuple>
 #include "InputActionValue.h"
-#include "Components/TimelineComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/TimelineComponent.h"
 #include "LivreCharacter.generated.h"
 
 // default classes
@@ -49,6 +49,7 @@ protected:
 	
 	virtual void BeginPlay();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& value);
@@ -129,6 +130,8 @@ public:
 	//void CustomDashReleased();
 	void CustomSlidePressed();
 	void CustomSlideReleased();
+	void BeginCameraTiltWall();
+	void EndCameraTiltWall();
 	
 	// wall events
 	void BeginWallRun();
@@ -146,6 +149,15 @@ public:
 	FTimerHandle resetJumps;
 	FTimerHandle internalTimerHandle;
 	UWorld* currentLevel;
+
+	// timeline functions
+	UFUNCTION()
+	void ProcessCameraTimeline(float timelineProgress);
+	
+	// timeline setup
+	FTimeline UpdateCameraTiltTimeline;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	UCurveFloat* UpdateCameraTiltCurve;
 	
 	//general functions
 	void StartWalk(float newWalkSpeed = 1000.0f);
@@ -260,6 +272,16 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float wallrunTime = 5.0;
 };
+
+inline void ALivreCharacter::Tick(float deltaSeconds)
+{
+	Super::Tick(deltaSeconds);
+
+	if (UpdateCameraTiltTimeline.IsPlaying())
+	{
+		UpdateCameraTiltTimeline.TickTimeline(deltaSeconds);
+	}
+}
 
 inline void ALivreCharacter::NotifyJumpApex()
 {

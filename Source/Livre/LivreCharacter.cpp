@@ -90,6 +90,15 @@ void ALivreCharacter::BeginPlay()
 	// Event Graph Functionality:
 	EventJumpReset(maxJump);
 	GetCharacterMovement()->SetPlaneConstraintEnabled(false);
+
+	if (UpdateCameraTiltCurve)
+	{
+		FOnTimelineFloat progressFunction;
+		progressFunction.BindUFunction(this, TEXT("processTimeline"));
+		UpdateCameraTiltTimeline.AddInterpFloat(UpdateCameraTiltCurve, progressFunction);
+
+		UpdateCameraTiltTimeline.SetTimelineLengthMode(TL_LastKeyFrame);
+	}
 	
 	//USkinnedMeshComponent::HideBoneByName(Neck, PBO_None); // might need to be a BP specific function
 	
@@ -270,6 +279,30 @@ void ALivreCharacter::CustomSlideReleased()
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
 }
 
+void ALivreCharacter::ProcessCameraTimeline(float timelineProgress)
+{
+	float timelineValue = timelineProgress;
+
+	if (wallRunSide == Left)
+	{
+		timelineValue *= -1;
+	}
+
+	GetController()->SetControlRotation(FRotator(GetController()->GetControlRotation().Pitch, GetController()->GetControlRotation().Yaw, timelineValue));
+	
+}
+
+void ALivreCharacter::BeginCameraTiltWall()
+{
+	UpdateCameraTiltTimeline.Play();
+	
+}
+
+void ALivreCharacter::EndCameraTiltWall()
+{
+	UpdateCameraTiltTimeline.Reverse();
+}
+
 // Custom collision profile
 FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 {
@@ -282,6 +315,8 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 
 	return parametres;
 }
+
+
 
 // Setting walking speed
 void ALivreCharacter::StartWalk(float newWalkSpeed)
