@@ -65,7 +65,7 @@ ALivreCharacter::ALivreCharacter()
 	wallDetectionCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	
 	// Connecting Collision Detection Functions
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::CapsuleTouched);
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ALivreCharacter::CapsuleTouched);
 
 	// Setting default speed
 	GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
@@ -93,8 +93,9 @@ void ALivreCharacter::BeginPlay()
 
 	if (UpdateCameraTiltCurve)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UpdatingCameraTiltCurve"));
 		FOnTimelineFloat progressFunction;
-		progressFunction.BindUFunction(this, TEXT("processTimeline"));
+		progressFunction.BindUFunction(this, TEXT("ProcessCameraTimeline"));
 		UpdateCameraTiltTimeline.AddInterpFloat(UpdateCameraTiltCurve, progressFunction);
 
 		UpdateCameraTiltTimeline.SetTimelineLengthMode(TL_LastKeyFrame);
@@ -281,6 +282,7 @@ void ALivreCharacter::CustomSlideReleased()
 
 void ALivreCharacter::ProcessCameraTimeline(float timelineProgress)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Processing CameraTimeline"));
 	float timelineValue = timelineProgress;
 
 	if (wallRunSide == Left)
@@ -289,7 +291,6 @@ void ALivreCharacter::ProcessCameraTimeline(float timelineProgress)
 	}
 
 	GetController()->SetControlRotation(FRotator(GetController()->GetControlRotation().Pitch, GetController()->GetControlRotation().Yaw, timelineValue));
-	
 }
 
 void ALivreCharacter::BeginCameraTiltWall()
@@ -316,8 +317,6 @@ FCollisionQueryParams ALivreCharacter::GetIgnoreCharacterParams()
 	return parametres;
 }
 
-
-
 // Setting walking speed
 void ALivreCharacter::StartWalk(float newWalkSpeed)
 {
@@ -341,12 +340,10 @@ void ALivreCharacter::StopWalk(float newNormalSpeed)
 // What is happening during actual wall run (math)
 void ALivreCharacter::UpdateWallRun()
 {
-
-
 	if (isWallRunning)
 	{	UE_LOG(LogTemp, Warning, TEXT("Start UpdateWallrun"));
 		const FVector startPos = GetActorLocation();
-		const FVector endPos = GetActorLocation() + (GetActorRightVector() * 250 * (wallRunSide == Left ? 1.0f : -1.0f));
+		const FVector endPos = GetActorLocation() + (GetActorRightVector() * 500 * (wallRunSide == Left ? 1.0f : -1.0f));
 		FHitResult hitResult;
 
 		bool didHit = LineTrace(startPos, endPos,  EDrawDebugTrace::ForDuration, hitResult);
@@ -531,15 +528,14 @@ void ALivreCharacter::CapsuleTouched(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& sweepResult)
+	FVector NormalImpulse,
+	const FHitResult &SweepResult)
 {
 	if (isWallRunning) return;
 
-	if (IsSurfaceWallRan(sweepResult.ImpactNormal) && GetCharacterMovement()->IsFalling())
+	if (IsSurfaceWallRan(SweepResult.ImpactNormal) && GetCharacterMovement()->IsFalling())
 	{
-		auto [OutDir, OutSide] = FindRunDirectionAndSide(sweepResult.ImpactNormal);
+		auto [OutDir, OutSide] = FindRunDirectionAndSide(SweepResult.ImpactNormal);
 		wallRunDirection = OutDir;
 
 		switch (OutSide)
@@ -581,6 +577,8 @@ void ALivreCharacter::BeginWallRun()
 		
 		isWallRunning = true;
 		hasLandedAfterWallRun = false;
+
+		BeginCameraTiltWall();
 	}
 }
 
@@ -609,11 +607,9 @@ void ALivreCharacter::EndWallRun(WallRunEnd why)
 		GetCharacterMovement()->GravityScale = initialGravity; 
 		isWallRunning = false;
 		isUpdatingWallRun = false;
+
+		EndCameraTiltWall();
 	}
-
-	//  place for camera tilt end
-
-	
 }
 
 void ALivreCharacter::WallDetectionBeginOverlap(
