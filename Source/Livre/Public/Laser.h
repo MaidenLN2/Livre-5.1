@@ -5,10 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CoreMinimal.h"
-#include "Components/ArrowComponent.h"
-#include "Components/BoxComponent.h"
 #include "Laser.generated.h"
 
+class ALivreCharacter;
 UCLASS()
 class LIVRE_API ALaser : public AActor
 {
@@ -23,61 +22,34 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 
 	// Mesh Variables
-	USceneComponent* SceneRoot;
-	UStaticMeshComponent* Base;
-	UArrowComponent* Arrow;
-
-	// Collision Components
 	UPROPERTY(EditInstanceOnly)
-	UBoxComponent* FrontCollision;
-	UPROPERTY(EditInstanceOnly)
-	UBoxComponent* BackCollision;
-	// Collision Overlaps
-	bool isFrontCollided = false;
-	bool isBackCollided = false;
+	UStaticMeshComponent* Mesh;
 
 	// functions
-	// Front
 	UFUNCTION()
-	void BeginFrontOverlap(
+	void BeginLaserOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult &SweepResult
-	);
-	UFUNCTION()
-	void EndFrontOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex
-	);
-
-	// Back
-	UFUNCTION()
-	void BeginBackOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult &SweepResult
-	);
-	UFUNCTION()
-	void EndBackOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex
 	);
 
 	UPROPERTY(EditAnywhere, Category = "Laser setup")
-	float lifetime;
+	float onlineTime = 2.0f;
+	UPROPERTY(EditAnywhere, Category = "Laser setup")
+	float offlineTime = 2.0f;
+	float trackingTime = 0.0f;
+
+	// bools
+	bool isActive = false;
+
+	static ALivreCharacter* luizRef;
 
 };
