@@ -262,7 +262,9 @@ void ALivreCharacter::CustomSlidePressed()
 	wasSlidingLongTime = true;
 		
 	GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
-	LaunchCharacter(GetActorForwardVector() * dashForce, true, false);		
+	//LaunchCharacter(GetActorForwardVector() * dashForce, true, false);
+	//isWalking = true;
+	//StartWalk();
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
@@ -272,6 +274,8 @@ void ALivreCharacter::CustomSlideReleased()
 {
 	UKismetSystemLibrary::PrintString(this, "Sliding Happened After Animation");
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//isWalking = false;
+	//StopWalk();
 	 if (wasSlidingLongTime)
 	 {
 	 	wasSlidingLongTime = false;
