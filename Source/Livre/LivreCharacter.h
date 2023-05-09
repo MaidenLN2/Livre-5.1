@@ -95,6 +95,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float dashTime = 0.7f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	float slideForce = 1500.0f;
+	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideTime = 0.7f;
 	
 	
@@ -242,7 +244,6 @@ private:
 	bool isWallRunningLong = false;
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
-	bool doOnce = true;
 
 	// floats for wall climbing/running
 
