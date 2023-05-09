@@ -253,22 +253,25 @@ void ALivreCharacter::CustomDashPressed()
 
 void ALivreCharacter::CustomSlidePressed()
 {
-	if (!GetCharacterMovement()->IsFalling() && !wasSlidingLongTime)
+	if (GetCharacterMovement()->Velocity.Length() >= 5.0f)
 	{
-	GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
-	{
-		CustomSlideReleased();
-	}, slideTime, false);
+		if (!GetCharacterMovement()->IsFalling() && !wasSlidingLongTime)
+		{
+			GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
+			{
+				CustomSlideReleased();
+			}, slideTime, false);
 
-	wasSlidingLongTime = true;
+			wasSlidingLongTime = true;
 		
-	GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
-	//LaunchCharacter(GetActorForwardVector() * dashForce, true, false);
-	//isWalking = true;
-	//StartWalk();
-	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
+			LaunchCharacter(GetActorForwardVector() * slideForce, true, false);
+			isWalking = true;
+			StartWalk();
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
 }
 
 void ALivreCharacter::CustomSlideReleased()
