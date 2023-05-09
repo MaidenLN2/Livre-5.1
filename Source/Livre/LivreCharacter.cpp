@@ -106,20 +106,20 @@ void ALivreCharacter::BeginPlay()
 	//timer functionality
 	currentLevel = GetWorld();
 	
-	GetWorld()->GetTimerManager().SetTimer(timeLimit, [&]()
-	{
-		if (time > 0)
-		{
-			time--;
-			UE_LOG(LogTemp, Warning, TEXT("Time = %i"), time);
-		}
-		else if (time <= 0)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
-			//SafeLevelReload();
-			UGameplayStatics::OpenLevel(this, FName("Time"));
-		}
-	}, 1.0, true);
+	// GetWorld()->GetTimerManager().SetTimer(timeLimit, [&]()
+	// {
+	// 	if (time > 0)
+	// 	{
+	// 		time--;
+	// 		UE_LOG(LogTemp, Warning, TEXT("Time = %i"), time);
+	// 	}
+	// 	else if (time <= 0)
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
+	// 		//SafeLevelReload();
+	// 		UGameplayStatics::OpenLevel(this, FName("Time"));
+	// 	}
+	// }, 1.0, true);
 }
 
 void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -253,23 +253,28 @@ void ALivreCharacter::CustomDashPressed()
 
 void ALivreCharacter::CustomSlidePressed()
 {
-	if (GetCharacterMovement()->Velocity.Length() >= 5.0f)
+	if (GetCharacterMovement()->Velocity.Length() >= 5.0f && !wasSlidingLongTime)
 	{
-		if (!GetCharacterMovement()->IsFalling() && !wasSlidingLongTime)
+		GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
 		{
-			GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
-			{
-				CustomSlideReleased();
-			}, slideTime, false);
+			CustomSlideReleased();
+		}, slideTime, false);
 
-			wasSlidingLongTime = true;
+		wasSlidingLongTime = true;
+		GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
+
+		FVector LaunchDirection = GetActorForwardVector() * slideForce;
 		
-			GetCapsuleComponent()->SetCapsuleHalfHeight(48.0f);
-			LaunchCharacter(GetActorForwardVector() * slideForce, true, false);
-			isWalking = true;
-			StartWalk();
-			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		if (GetCharacterMovement()->IsFalling())
+		{
+			LaunchDirection *= -GetActorUpVector();
 		}
+		
+		LaunchCharacter(LaunchDirection, true, false);
+		isWalking = true;
+		StartWalk();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
 		UE_LOG(LogTemp, Warning, TEXT("Custom Slide Pressed"));
 	}
 }
