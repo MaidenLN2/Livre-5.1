@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <tuple>
 #include "InputActionValue.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/TimelineComponent.h"
 #include "LivreCharacter.generated.h"

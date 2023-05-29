@@ -17,7 +17,6 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-
 /*
 LivreCharacter: Luiz Guilherme Ferreira Costa
 Age: 17
@@ -48,7 +47,6 @@ ALivreCharacter::ALivreCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 	
 	//tUpdateWallRun = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline UpdaterWallRun"));
@@ -57,8 +55,8 @@ ALivreCharacter::ALivreCharacter()
 	wallDetectionCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Wall Detector"));
 	wallDetectionCapsule->SetupAttachment(RootComponent);
 	wallDetectionCapsule->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
-	wallDetectionCapsule->SetCapsuleHalfHeight(200.0f);
-	wallDetectionCapsule->SetCapsuleRadius(10.0f);
+	wallDetectionCapsule->SetCapsuleHalfHeight(100.0f);
+	wallDetectionCapsule->SetCapsuleRadius(50.0f);
 	wallDetectionCapsule->OnComponentBeginOverlap.AddDynamic(this, &ALivreCharacter::WallDetectionBeginOverlap);
 	wallDetectionCapsule->OnComponentEndOverlap.AddDynamic(this, &ALivreCharacter::WallDetectionEndOverlap);
 	wallDetectionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -590,7 +588,7 @@ void ALivreCharacter::BeginWallRun()
 		
 		isWallRunning = true;
 		hasLandedAfterWallRun = false;
-
+		
 		BeginCameraTiltWall();
 	}
 }
