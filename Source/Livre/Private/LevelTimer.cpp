@@ -27,6 +27,7 @@ void ALevelTimer::BeginPlay()
 		else if (time <= 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
+			IDKNameTempDeezNuts();
 			UGameplayStatics::OpenLevel(this, FName("Time"));
 		}
 	}, 1.0, true);
