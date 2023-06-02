@@ -27,7 +27,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void IDKNameTempDeezNuts();
+	void IDKNameTemp();
 
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
