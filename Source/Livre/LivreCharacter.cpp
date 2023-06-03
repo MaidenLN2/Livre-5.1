@@ -245,8 +245,7 @@ void ALivreCharacter::CustomWalkReleased()
 //Sliding functionality
 void ALivreCharacter::CustomDashPressed()
 {
-     	GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, dashTime, false);
-		LaunchCharacter(GetActorForwardVector() * dashForce, true, false);		
+	ProcessDash();
 }
 
 void ALivreCharacter::CustomSlidePressed()
@@ -313,6 +312,21 @@ void ALivreCharacter::BeginCameraTiltWall()
 void ALivreCharacter::EndCameraTiltWall()
 {
 	UpdateCameraTiltTimeline.Reverse();
+}
+
+void ALivreCharacter::ProcessDash()
+{
+	if (!isDashing)
+	{
+		isDashing = true;
+		
+		GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
+		{
+			isDashing = false;
+		}, dashTime, false);
+	
+		LaunchCharacter(GetActorForwardVector() * dashForce, true, false);
+	}
 }
 
 // Custom collision profile
