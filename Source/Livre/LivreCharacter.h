@@ -87,7 +87,7 @@ public:
 	// movement floats for accessibility in editor
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float normalSpeed = 1000.0f;
-	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Testing")
 	float walkSpeed = 250.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float wallRunSpeed = 1000.0f;
