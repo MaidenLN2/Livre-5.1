@@ -91,9 +91,9 @@ public:
 	float walkSpeed = 250.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float wallRunSpeed = 1000.0f;
-	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Testing")
 	float dashForce = 2500.0f;
-	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Testing")
 	float dashTime = 0.7f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideForce = 1500.0f;
@@ -135,6 +135,9 @@ public:
 	void CustomSlideReleased();
 	void BeginCameraTiltWall();
 	void EndCameraTiltWall();
+	
+	UFUNCTION(BlueprintCallable)
+	void ProcessDash();
 	
 	// wall events
 	void BeginWallRun();
@@ -245,6 +248,8 @@ private:
 	bool isWallRunningLong = false;
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool isDashing = false;
 
 	// floats for wall climbing/running
 
