@@ -14,6 +14,8 @@ class LIVRE_API ALevelTimer : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ALevelTimer();
+	UWorld* currentLevel;
+	void SafeLevelReload();
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,6 +27,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void IDKNameTemp();
 
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
