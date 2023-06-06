@@ -71,8 +71,13 @@ void ALaser::Tick(float DeltaTime)
 	}
 }
 
+ALivreCharacter* ALaser::GetPlayerRef()
+{
+	return (luizRef ? luizRef : nullptr);
+}
+
 void ALaser::BeginLaserOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == luizRef)
 	{
