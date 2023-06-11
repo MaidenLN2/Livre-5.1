@@ -100,7 +100,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideTime = 0.7f;
 	
-	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* lookAction;

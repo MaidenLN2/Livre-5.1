@@ -66,7 +66,8 @@ ALivreCharacter::ALivreCharacter()
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ALivreCharacter::CapsuleTouched);
 
 	// Setting default speed
-	GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+	// Set in BP
+	// GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
 
 }
 
@@ -155,7 +156,7 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
  		enhancedInputComponent->BindAction(dashAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomDashPressed);
 
  		//Sliding
- 		enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
+ 		//enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
  		//enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
 
  		//Wallrunning
