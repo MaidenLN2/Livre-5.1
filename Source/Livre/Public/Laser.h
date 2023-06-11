@@ -18,6 +18,8 @@ public:
 	ALaser();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	static ALivreCharacter* GetPlayerRef();
 	
 protected:
 	// Called when the game starts or when spawned
@@ -27,7 +29,7 @@ protected:
 private:
 
 	// Mesh Variables
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Mesh;
 
 	// functions

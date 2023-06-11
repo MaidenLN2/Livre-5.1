@@ -91,15 +91,14 @@ public:
 	float walkSpeed = 250.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float wallRunSpeed = 1000.0f;
-	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Testing")
 	float dashForce = 2500.0f;
-	UPROPERTY(EditAnywhere, Category = "Movement Testing")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Testing")
 	float dashTime = 0.7f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideForce = 1500.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideTime = 0.7f;
-	
 	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -135,6 +134,9 @@ public:
 	void CustomSlideReleased();
 	void BeginCameraTiltWall();
 	void EndCameraTiltWall();
+	
+	UFUNCTION(BlueprintCallable)
+	void ProcessDash();
 	
 	// wall events
 	void BeginWallRun();
@@ -179,6 +181,10 @@ public:
 	void EventAnyDamage(float damage);
 	bool LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType, FHitResult& hitResult);
 	void SafeLevelReload();
+
+	// Health
+	UFUNCTION(BlueprintImplementableEvent)
+	void DealDamageToPlayer(int DamageToDeal);
 	
 	// macros
 	bool JumpUsed();
@@ -223,6 +229,8 @@ private:
 	virtual void NotifyJumpApex() override;
 	
 	//health system
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int health = 5;
 	bool isDead = false;
 	
 	// vector variables for wall climbing/running
@@ -245,10 +253,10 @@ private:
 	bool isWallRunningLong = false;
 	bool wantsToCrouch = false;
 	bool orientRotationToMovement = false;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool isDashing = false;
 
 	// floats for wall climbing/running
-
-	float health;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float initialGravity = 1.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
