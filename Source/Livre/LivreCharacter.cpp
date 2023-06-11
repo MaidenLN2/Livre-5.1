@@ -155,7 +155,7 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
  		enhancedInputComponent->BindAction(dashAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomDashPressed);
 
  		//Sliding
- 		//enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
+ 		enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
  		//enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
 
  		//Wallrunning
@@ -245,7 +245,8 @@ void ALivreCharacter::CustomWalkReleased()
 //Sliding functionality
 void ALivreCharacter::CustomDashPressed()
 {
-	ProcessDash();
+     	GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, dashTime, false);
+		LaunchCharacter(GetActorForwardVector() * dashForce, true, false);		
 }
 
 void ALivreCharacter::CustomSlidePressed()
@@ -312,21 +313,6 @@ void ALivreCharacter::BeginCameraTiltWall()
 void ALivreCharacter::EndCameraTiltWall()
 {
 	UpdateCameraTiltTimeline.Reverse();
-}
-
-void ALivreCharacter::ProcessDash()
-{
-	if (!isDashing)
-	{
-		isDashing = true;
-		
-		GetWorld()->GetTimerManager().SetTimer(internalTimerHandle, [&]()
-		{
-			isDashing = false;
-		}, dashTime, false);
-	
-		LaunchCharacter(GetActorForwardVector() * dashForce, true, false);
-	}
 }
 
 // Custom collision profile

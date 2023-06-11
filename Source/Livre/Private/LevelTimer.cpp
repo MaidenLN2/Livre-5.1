@@ -12,13 +12,6 @@ ALevelTimer::ALevelTimer()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void ALevelTimer::SafeLevelReload()
-{
-	currentLevel->GetTimerManager().ClearAllTimersForObject(this);
-
-	UGameplayStatics::OpenLevelBySoftObjectPtr(this, TSoftObjectPtr<UWorld>(currentLevel), false);
-}
-
 // Called when the game starts or when spawned
 void ALevelTimer::BeginPlay()
 {
