@@ -100,7 +100,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float slideTime = 0.7f;
 	
-	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* lookAction;
@@ -182,6 +181,10 @@ public:
 	void EventAnyDamage(float damage);
 	bool LineTrace(FVector startPos, FVector endPos, EDrawDebugTrace::Type durationType, FHitResult& hitResult);
 	void SafeLevelReload();
+
+	// Health
+	UFUNCTION(BlueprintImplementableEvent)
+	void DealDamageToPlayer(int DamageToDeal);
 	
 	// macros
 	bool JumpUsed();
@@ -226,6 +229,8 @@ private:
 	virtual void NotifyJumpApex() override;
 	
 	//health system
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int health = 5;
 	bool isDead = false;
 	
 	// vector variables for wall climbing/running
@@ -252,8 +257,6 @@ private:
 	bool isDashing = false;
 
 	// floats for wall climbing/running
-
-	float health;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
 	float initialGravity = 1.0f;
 	UPROPERTY(EditAnywhere, Category = "Movement Testing")
