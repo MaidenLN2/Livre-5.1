@@ -183,7 +183,7 @@ public:
 	void SafeLevelReload();
 
 	// Health
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DealDamageToPlayer(int DamageToDeal);
 	
 	// macros
