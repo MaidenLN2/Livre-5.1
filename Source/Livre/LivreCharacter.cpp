@@ -166,8 +166,8 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
  		playerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
  		playerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
- 		playerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
- 		playerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
+ 		//playerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
+ 		//playerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
  	}
  }
 
