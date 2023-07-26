@@ -12,13 +12,6 @@ ALevelTimer::ALevelTimer()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void ALevelTimer::SafeLevelReload()
-{
-	currentLevel->GetTimerManager().ClearAllTimersForObject(this);
-
-	UGameplayStatics::OpenLevelBySoftObjectPtr(this, TSoftObjectPtr<UWorld>(currentLevel), false);
-}
-
 // Called when the game starts or when spawned
 void ALevelTimer::BeginPlay()
 {
@@ -35,7 +28,7 @@ void ALevelTimer::BeginPlay()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Timer Ended"));
 			IDKNameTemp();
-			UGameplayStatics::OpenLevel(this, FName("Time"));
+			GetWorld()->GetTimerManager().ClearTimer(timeLimit);
 		}
 	}, 1.0, true);
 }

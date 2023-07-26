@@ -153,6 +153,7 @@ public:
 	FTimerHandle delayHandle;
 	FTimerHandle resetJumps;
 	FTimerHandle internalTimerHandle;
+	FTimerHandle slideRelease;
 	UWorld* currentLevel;
 
 	// timeline functions

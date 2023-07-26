@@ -14,8 +14,6 @@ class LIVRE_API ALevelTimer : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ALevelTimer();
-	UWorld* currentLevel;
-	void SafeLevelReload();
 
 protected:
 	// Called when the game starts or when spawned
