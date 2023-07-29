@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/MovementComponent.h" // for update component etc
 #include "CoreFwd.h" // for some vectors
+#include "Engine/StaticMeshActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -129,6 +130,7 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(delayHandle);
 	GetWorld()->GetTimerManager().ClearTimer(resetJumps);
 	GetWorld()->GetTimerManager().ClearTimer(internalTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(slideRelease);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -155,9 +157,6 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
  		//Dashin
  		enhancedInputComponent->BindAction(dashAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomDashPressed);
 
- 		//Sliding
- 		//enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Started, this, &ALivreCharacter::CustomSlidePressed);
- 		//enhancedInputComponent->BindAction(slideAction, ETriggerEvent::Completed, this, &ALivreCharacter::CustomSlideReleased);	// Stops the player from sliding and resets their values
 
  		//Wallrunning
  		enhancedInputComponent->BindAction(wallrunAction, ETriggerEvent::Started, this, &ALivreCharacter::BeginWallRun);
@@ -166,8 +165,7 @@ void ALivreCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
  		playerInputComponent->BindAxis("Forward", this, &ALivreCharacter::MoveForward);
  		playerInputComponent->BindAxis("Right", this, &ALivreCharacter::MoveLateral);
- 		//playerInputComponent->BindAxis("MouseX", this, &ALivreCharacter::LookHorizontal);
- 		//playerInputComponent->BindAxis("MouseY", this, &ALivreCharacter::LookVertical);
+
  	}
  }
 
@@ -283,11 +281,12 @@ void ALivreCharacter::CustomSlideReleased()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	//isWalking = false;
 	//StopWalk();
-	 if (wasSlidingLongTime)
-	 {
-	 	wasSlidingLongTime = false;
-	 	GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
-	 }
+	if (wasSlidingLongTime)
+	{
+		wasSlidingLongTime = false;
+		GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("Custom Slide Released"));
 }
 
