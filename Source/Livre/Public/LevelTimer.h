@@ -27,11 +27,15 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void IDKNameTemp();
+	void EndTimer();
 
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	int time = 180;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	USoundBase* TimerEndingSound;
+	float finalSoundTimeTracker = 0.0f;
 
 	FTimerHandle timeLimit;
 };
